@@ -1,3 +1,10 @@
+(defgroup dokuwiki nil
+  "Guide key bidings."
+  :group 'text
+  :prefix "dokuwiki"
+  :tag "DokuWiki"
+  :link '(url-link "https://www.dokuwiki.org/dokuwiki"))
+
 (defvar dokuwiki-mode-map
   (let ((map (make-sparse-keymap)))
     map)

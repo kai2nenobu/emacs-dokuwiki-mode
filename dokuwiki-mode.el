@@ -59,11 +59,11 @@
    ;; verbatim
    '("%%.+?%%" (0 'dokuwiki-code t))
    ;; headline
-   '("[ \t]?======.+======[ \t]*$" (0 'dokuwiki-headline-1))
-   '("[ \t]?=====.+=====[ \t]*$" (0 'dokuwiki-headline-2))
-   '("[ \t]?====.+====[ \t]*$" (0 'dokuwiki-headline-3))
-   '("[ \t]?===.+===[ \t]*$" (0 'dokuwiki-headline-4))
-   '("[ \t]?==.+==[ \t]*$" (0 'dokuwiki-headline-5))
+   '(" ?======.+======[ \t]*$" (0 'dokuwiki-headline-1))
+   '(" ?=====.+=====[ \t]*$" (0 'dokuwiki-headline-2))
+   '(" ?====.+====[ \t]*$" (0 'dokuwiki-headline-3))
+   '(" ?===.+===[ \t]*$" (0 'dokuwiki-headline-4))
+   '(" ?==.+==[ \t]*$" (0 'dokuwiki-headline-5))
    ;; link
    '("\\[\\[[^]]+\\]\\]" (0 'dokuwiki-link))
    ;; linebreak

@@ -75,8 +75,13 @@
    ;; list
    '("^\\(?: \\{2\\}\\|[\t]\\)[ \t]*" "\\([-*]\\).*$" nil nil (1 'dokuwiki-list))
    ;; code block
-   '("^\\(?: \\{2,\\}\\|[\t]\\).*$" (0 'dokuwiki-code t))
+   '("^\\(?: \\{2\\}\\|[\t]\\)[ \t]*" dokuwiki-code-block-search
+     nil nil (0 'dokuwiki-code t))
    ))
+
+(defun dokuwiki-code-block-search (limit)
+  (if (not (looking-at "[-*]"))
+      (re-search-forward ".*$" limit t)))
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"

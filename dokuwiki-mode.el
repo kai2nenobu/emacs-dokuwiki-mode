@@ -81,7 +81,7 @@
    (" ?===.+===[ \t]*$" (0 'dokuwiki-headline-4))
    (" ?==.+==[ \t]*$" (0 'dokuwiki-headline-5))
    ;; link
-   ("\\[\\[[^|].+?\\(?:\\(|\\)\\(.*?\\)\\)?\\]\\]"
+   ("\\[\\[[^|]+?\\(?:\\(|\\)\\(.*?\\)\\)?\\]\\]"
     (0 'dokuwiki-link) (1 'dokuwiki-code t t)
     (2 'font-lock-string-face t t) (2 'underline append t))
    ;; linebreak

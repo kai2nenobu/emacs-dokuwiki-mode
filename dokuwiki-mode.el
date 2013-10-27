@@ -19,6 +19,9 @@
   "Smiley list in DokuWiki.")
 
 ;;;; Faces
+(defface dokuwiki-box '((t (:box t)))
+  "Face enabled box property")
+
 (defface dokuwiki-code '((t (:inherit shadow)))
   "DokuWiki face for code."
   :group 'dokuwiki)
@@ -68,7 +71,7 @@
    ;; underline
    ("__.+?__" . (0 'underline append))
    ;; monospace
-   ("''.+?''" (0 'dokuwiki-code append))
+   ("''\\(.+?\\)''" (0 'dokuwiki-code append) (1 'dokuwiki-box append))
    ;; verbatim
    ("%%.+?%%" (0 'dokuwiki-code t))
    ;; headline

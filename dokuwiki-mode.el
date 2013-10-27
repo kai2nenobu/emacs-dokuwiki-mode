@@ -62,6 +62,10 @@
   "DokuWiki face for link."
   :group 'dokuwiki)
 
+(defface dokuwiki-image '((t (:inherit font-lock-variable-name-face)))
+  "DokuWiki face for image."
+  :group 'dokuwiki)
+
 (defface dokuwiki-smiley '((t (:inherit font-lock-constant-face)))
   "DokuWiki face for smiley."
   :group 'dokuwiki)
@@ -90,6 +94,10 @@
    ("\\[\\[[^|]+?\\(?:\\(|\\)\\(.*?\\)\\)?\\]\\]"
     (0 'dokuwiki-link) (1 'dokuwiki-code t t)
     (2 'font-lock-string-face t t) (2 'underline append t))
+   ;; image
+   ("{{[^|]+?\\(|\\(.*?\\)\\)?}}"
+    (0 'dokuwiki-image t)
+    (1 'dokuwiki-code t t) (2 'font-lock-string-face t t))
    ;; linebreak
    ("\\\\\\\\\\s-+" (0 'dokuwiki-code t))
    ;; list

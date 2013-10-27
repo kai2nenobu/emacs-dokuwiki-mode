@@ -49,23 +49,23 @@
 (defvar dokuwiki-font-lock-keywords
   (list
    ;; bold
-   '("\\*\\*.+\\*\\*" . 'font-lock-keyword-face)
+   '("\\*\\*.+?\\*\\*" (0 'bold append))
    ;; italic
-   '("//.+//" . 'font-lock-keyword-face)
+   '("//.+?//" . (0 'italic append))
    ;; underline
-   '("__.+__" . 'font-lock-keyword-face)
+   '("__.+?__" . (0 'underline append))
    ;; monospace
-   '("''.+''" . 'font-lock-keyword-face)
+   '("''.+?''" (0 'dokuwiki-code append))
    ;; headline
-   '("[ \t]?======.+======[ \t]*$" . 'outline-1)
-   '("[ \t]?=====.+=====[ \t]*$" . 'outline-2)
-   '("[ \t]?====.+====[ \t]*$" . 'outline-3)
-   '("[ \t]?===.+===[ \t]*$" . 'outline-4)
-   '("[ \t]?==.+==[ \t]*$" . 'outline-5)
+   '("[ \t]?======.+======[ \t]*$" (0 'dokuwiki-headline-1))
+   '("[ \t]?=====.+=====[ \t]*$" (0 'dokuwiki-headline-2))
+   '("[ \t]?====.+====[ \t]*$" (0 'dokuwiki-headline-3))
+   '("[ \t]?===.+===[ \t]*$" (0 'dokuwiki-headline-4))
+   '("[ \t]?==.+==[ \t]*$" (0 'dokuwiki-headline-5))
    ;; link
-   '("\\[\\[[^]]+\\]\\]" . 'font-lock-keyword-face)
+   '("\\[\\[[^]]+\\]\\]" (0 'dokuwiki-link))
    ;; linebreak
-   '("\\\\\\\\\\s-+" . 'font-lock-keyword-face)
+   '("\\\\\\\\\\s-+" (0 'dokuwiki-code t))
    ))
 
 ;;;###autoload

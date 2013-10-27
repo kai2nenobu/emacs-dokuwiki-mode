@@ -98,6 +98,7 @@
    ("\\[\\[[^|]+?\\(?:\\(|\\)\\(.*?\\)\\)?\\]\\]"
     (0 'dokuwiki-link) (1 'dokuwiki-code t t)
     (2 'font-lock-string-face t t) (2 'underline append t))
+   ("https?://\\(\\([-_.!~*'()a-zA-Z0-9;?:@&=+$,%#]+\\)/?\\)+" (0 'dokuwiki-link))
    ;; image
    ("{{[^|]+?\\(|\\(.*?\\)\\)?}}"
     (0 'dokuwiki-image t)

@@ -18,6 +18,10 @@
   "DokuWiki face for code."
   :group 'dokuwiki)
 
+(defface dokuwiki-list '((t (:inherit font-lock-type-face)))
+  "DokuWiki face for list."
+  :group 'dokuwiki)
+
 (defface dokuwiki-verbatim '((t (:inherit shadow)))
   "DokuWiki face for text as is."
   :group 'dokuwiki)
@@ -68,6 +72,8 @@
    '("\\[\\[[^]]+\\]\\]" (0 'dokuwiki-link))
    ;; linebreak
    '("\\\\\\\\\\s-+" (0 'dokuwiki-code t))
+   ;; list
+   '("^\\(?: \\{2\\}\\|[\t]\\)[ \t]*" "\\([-*]\\).*$" nil nil (1 'dokuwiki-list))
    ;; code block
    '("^\\(?: \\{2,\\}\\|[\t]\\).*$" (0 'dokuwiki-code t))
    ))

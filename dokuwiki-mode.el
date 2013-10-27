@@ -56,6 +56,8 @@
    '("__.+?__" . (0 'underline append))
    ;; monospace
    '("''.+?''" (0 'dokuwiki-code append))
+   ;; verbatim
+   '("%%.+?%%" (0 'dokuwiki-code t))
    ;; headline
    '("[ \t]?======.+======[ \t]*$" (0 'dokuwiki-headline-1))
    '("[ \t]?=====.+=====[ \t]*$" (0 'dokuwiki-headline-2))
@@ -66,6 +68,8 @@
    '("\\[\\[[^]]+\\]\\]" (0 'dokuwiki-link))
    ;; linebreak
    '("\\\\\\\\\\s-+" (0 'dokuwiki-code t))
+   ;; code block
+   '("^\\(?: \\{2,\\}\\|[\t]\\).*$" (0 'dokuwiki-code t))
    ))
 
 ;;;###autoload

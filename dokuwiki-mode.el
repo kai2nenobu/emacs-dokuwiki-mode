@@ -51,33 +51,33 @@
   :group 'dokuwiki)
 
 (defvar dokuwiki-font-lock-keywords
-  (list
+  `(
    ;; bold
-   '("\\*\\*.+?\\*\\*" (0 'bold append))
+   ("\\*\\*.+?\\*\\*" (0 'bold append))
    ;; italic
-   '("//.+?//" . (0 'italic append))
+   ("//.+?//" . (0 'italic append))
    ;; underline
-   '("__.+?__" . (0 'underline append))
+   ("__.+?__" . (0 'underline append))
    ;; monospace
-   '("''.+?''" (0 'dokuwiki-code append))
+   ("''.+?''" (0 'dokuwiki-code append))
    ;; verbatim
-   '("%%.+?%%" (0 'dokuwiki-code t))
+   ("%%.+?%%" (0 'dokuwiki-code t))
    ;; headline
-   '(" ?======.+======[ \t]*$" (0 'dokuwiki-headline-1))
-   '(" ?=====.+=====[ \t]*$" (0 'dokuwiki-headline-2))
-   '(" ?====.+====[ \t]*$" (0 'dokuwiki-headline-3))
-   '(" ?===.+===[ \t]*$" (0 'dokuwiki-headline-4))
-   '(" ?==.+==[ \t]*$" (0 'dokuwiki-headline-5))
+   (" ?======.+======[ \t]*$" (0 'dokuwiki-headline-1))
+   (" ?=====.+=====[ \t]*$" (0 'dokuwiki-headline-2))
+   (" ?====.+====[ \t]*$" (0 'dokuwiki-headline-3))
+   (" ?===.+===[ \t]*$" (0 'dokuwiki-headline-4))
+   (" ?==.+==[ \t]*$" (0 'dokuwiki-headline-5))
    ;; link
-   '("\\[\\[[^|].+?\\(?:\\(|\\)\\(.*?\\)\\)?\\]\\]"
-     (0 'dokuwiki-link) (1 'dokuwiki-code t t)
-     (2 'font-lock-string-face t t) (2 'underline append t))
+   ("\\[\\[[^|].+?\\(?:\\(|\\)\\(.*?\\)\\)?\\]\\]"
+    (0 'dokuwiki-link) (1 'dokuwiki-code t t)
+    (2 'font-lock-string-face t t) (2 'underline append t))
    ;; linebreak
-   '("\\\\\\\\\\s-+" (0 'dokuwiki-code t))
+   ("\\\\\\\\\\s-+" (0 'dokuwiki-code t))
    ;; list
-   '("^\\(?: \\{2\\}\\|[\t]\\)[ \t]*" "\\([-*]\\).*$" nil nil (1 'dokuwiki-list))
+   ("^\\(?: \\{2\\}\\|[\t]\\)[ \t]*" "\\([-*]\\).*$" nil nil (1 'dokuwiki-list))
    ;; code block
-   '("^\\(?: \\{2\\}\\|[\t]\\)[ \t]*" dokuwiki-code-block-search
+   ("^\\(?: \\{2\\}\\|[\t]\\)[ \t]*" dokuwiki-code-block-search
      nil nil (0 'dokuwiki-code t))
    ))
 

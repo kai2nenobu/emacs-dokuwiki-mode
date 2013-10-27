@@ -34,6 +34,10 @@
   "DokuWiki face for text as is."
   :group 'dokuwiki)
 
+(defface dokuwiki-footnote '((t (:inherit font-lock-builtin-face)))
+  "DokuWiki face for footnote."
+  :group 'dokuwiki)
+
 (defface dokuwiki-headline-1 '((t (:inherit outline-1)))
   "DokuWiki face for level 1 headline."
   :group 'dokuwiki)
@@ -74,6 +78,8 @@
    ("''\\(.+?\\)''" (0 'dokuwiki-code append) (1 'dokuwiki-box append))
    ;; verbatim
    ("%%.+?%%" (0 'dokuwiki-code t))
+   ;; footnote
+   ("((.+?))" (0 'dokuwiki-footnote))
    ;; headline
    (" ?======.+======[ \t]*$" (0 'dokuwiki-headline-1))
    (" ?=====.+=====[ \t]*$" (0 'dokuwiki-headline-2))

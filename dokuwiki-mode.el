@@ -13,6 +13,11 @@
 (defvar dokuwiki-mode-hook nil
   "dokuwiki-mode-hook.")
 
+(defvar dokuwiki-smiley-list
+  '("8-)" "8-O" ":-(" ":-)" "=) " ":-/" ":-\\" ":-?" ":-D" ":-P" ":-O"
+    ":-X" ":-|" ";-)" "^_^" ":?:" ":!:" "LOL" "FIXME" "DELETEME")
+  "Smiley list in DokuWiki.")
+
 ;;;; Faces
 (defface dokuwiki-code '((t (:inherit shadow)))
   "DokuWiki face for code."
@@ -50,6 +55,10 @@
   "DokuWiki face for link."
   :group 'dokuwiki)
 
+(defface dokuwiki-smiley '((t (:inherit font-lock-constant-face)))
+  "DokuWiki face for smiley."
+  :group 'dokuwiki)
+
 (defvar dokuwiki-font-lock-keywords
   `(
    ;; bold
@@ -79,6 +88,11 @@
    ;; code block
    ("^\\(?: \\{2\\}\\|[\t]\\)[ \t]*" dokuwiki-code-block-search
      nil nil (0 'dokuwiki-code t))
+   ;; smiley
+   ,@(mapcar #'(lambda (smiley)
+                 (list (concat "\\W\\(" (regexp-quote smiley) "\\)\\W")
+                       1 'dokuwiki-smiley))
+             dokuwiki-smiley-list)
    ))
 
 (defun dokuwiki-code-block-search (limit)

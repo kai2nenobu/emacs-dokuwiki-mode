@@ -46,6 +46,10 @@
     ":-X" ":-|" ";-)" "^_^" ":?:" ":!:" "LOL" "FIXME" "DELETEME")
   "Smiley list in DokuWiki.")
 
+(defvar dokuwiki-outline-regexp " ?\\(=\\{2,6\\}\\)"
+  "Regexp which indicates headline in DokuWiki.
+See also `outline-regexp'.")
+
 ;;;; Faces
 (defface dokuwiki-box '((t (:box t)))
   "Face enabled box property")
@@ -150,6 +154,15 @@
 (defun dokuwiki-code-block-search (limit)
   (if (not (looking-at "[-*]"))
       (re-search-forward ".*$" limit t)))
+
+(defun dokuwiki-outline-level ()
+  "Compute a header's nesting level in `dokuwiki-mode'.
+See also `outline-level'.
+"
+  (when (looking-at outline-regexp)
+    (let ((const 7)
+          (headline (match-string 1)))
+      (- const (length headline)))))
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"

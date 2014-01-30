@@ -27,7 +27,7 @@
 ;;; Code:
 
 (defgroup dokuwiki nil
-  "Guide key bidings."
+  "Major mode for DokuWiki document."
   :group 'text
   :prefix "dokuwiki"
   :tag "DokuWiki"
@@ -153,7 +153,7 @@
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"
-  "Major mode for DokuWiki."
+  "Major mode for DokuWiki document."
   (set (make-local-variable 'font-lock-defaults)
        '(dokuwiki-font-lock-keywords
          nil nil ((?_ . "w")) nil))

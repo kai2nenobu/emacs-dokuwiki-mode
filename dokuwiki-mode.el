@@ -4,7 +4,7 @@
 
 ;; Author: Tsunenobu Kai <kbkbkbkb1@gmail.com>
 ;; URL: https://github.com/kbkbkbkb1/emacs-dokuwiki
-;; Version: 0.0.1
+;; Version: 0.1.0
 ;; Keywords: DokuWiki
 
 ;; This file is not part of GNU Emacs.

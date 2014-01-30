@@ -1,3 +1,17 @@
-* dokuwiki-mode
-Major mode for DokuWiki
-
+* Overview
+Major mode for DokuWiki document
+* Features
+** Highlight markup of DokuWiki
+** Work with ~outline-magic~
+~outline-magic~ enables to handle headings like ~org-mode~. If you load
+~outline-magic~, ~dokuwiki-mode~ use it.
+* TODOs
+- [ ] Highlight multiline block
+- [ ] Improve behavior of ~outline-promote~ and ~outline-demote~
+* ChangeLog
+- Version 0.1.0
+  - Enable ~outline-minor-mode~
+  - Work with ~outline-magic~
+- Version 0.0.1
+  - Highlight markup
+  - Initial version

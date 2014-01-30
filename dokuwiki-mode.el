@@ -35,16 +35,23 @@
 
 (defvar dokuwiki-mode-map
   (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-n") 'outline-next-visible-heading)
+    (define-key map (kbd "C-c C-p") 'outline-previous-visible-heading)
+    (define-key map (kbd "C-c C-f") 'outline-forward-same-level)
+    (define-key map (kbd "C-c C-b") 'outline-backward-same-level)
+    (define-key map (kbd "C-c C-u") 'outline-up-heading)
+    (define-key map (kbd "C-c C-@") 'outline-mark-subtree)
     map)
   "Keymap for the `dokuwiki-mode'.")
-
-(defvar dokuwiki-mode-hook nil
-  "dokuwiki-mode-hook.")
 
 (defvar dokuwiki-smiley-list
   '("8-)" "8-O" ":-(" ":-)" "=) " ":-/" ":-\\" ":-?" ":-D" ":-P" ":-O"
     ":-X" ":-|" ";-)" "^_^" ":?:" ":!:" "LOL" "FIXME" "DELETEME")
   "Smiley list in DokuWiki.")
+
+(defvar dokuwiki-outline-regexp " ?\\(=\\{2,6\\}\\)"
+  "Regexp which indicates headline in DokuWiki.
+See also `outline-regexp'.")
 
 ;;;; Faces
 (defface dokuwiki-box '((t (:box t)))
@@ -151,12 +158,46 @@
   (if (not (looking-at "[-*]"))
       (re-search-forward ".*$" limit t)))
 
+(defun dokuwiki-outline-level ()
+  "Compute a header's nesting level in `dokuwiki-mode'.
+See also `outline-level'."
+  (when (looking-at outline-regexp)
+    (let ((const 7)
+          (headline (match-string 1)))
+      (- const (length headline)))))
+
+;;;; Work with `outline-magic'
+(eval-after-load "outline-magic"
+  '(progn
+     (define-key dokuwiki-mode-map (kbd "TAB") 'outline-cycle)
+     (define-key dokuwiki-mode-map (kbd "<S-tab>")
+       '(lambda () (interactive) (outline-cycle '(4))))
+     (define-key dokuwiki-mode-map (kbd "<M-S-right>") 'outline-demote)
+     (define-key dokuwiki-mode-map (kbd "<M-S-left>") 'outline-promote)
+     (define-key dokuwiki-mode-map (kbd "<M-up>") 'outline-move-subtree-up)
+     (define-key dokuwiki-mode-map (kbd "<M-down>") 'outline-move-subtree-down)
+     (add-hook 'dokuwiki-mode-hook 'dokuwiki-outline-magic-hook)
+     ;; Enable outline-magic features in `dokuwiki-mode' buffers
+     (dolist (buf (buffer-list))
+       (with-current-buffer buf
+         (when (eq major-mode 'dokuwiki-mode) (dokuwiki-outline-magic-hook))))
+     ))
+
+(defun dokuwiki-outline-magic-hook ()
+  "Hook to configure `outline-magic'."
+  (set (make-local-variable 'outline-promotion-headings)
+       '(("======" . 1) ("=====" . 2) ("====" . 3) ("===" . 4) ("==" . 5)))
+  (set (make-local-variable 'outline-cycle-emulate-tab) t))
+
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"
   "Major mode for DokuWiki document."
   (set (make-local-variable 'font-lock-defaults)
        '(dokuwiki-font-lock-keywords
          nil nil ((?_ . "w")) nil))
+  (set (make-local-variable 'outline-regexp) dokuwiki-outline-regexp)
+  (set (make-local-variable 'outline-level) 'dokuwiki-outline-level)
+  (outline-minor-mode 1)
   )
 
 (provide 'dokuwiki-mode)

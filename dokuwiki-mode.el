@@ -169,6 +169,29 @@ See also `outline-level'."
           (headline (match-string 1)))
       (- const (length headline)))))
 
+;;;; Work with `outline-magic'
+(eval-after-load "outline-magic"
+  '(progn
+     (define-key dokuwiki-mode-map (kbd "TAB") 'outline-cycle)
+     (define-key dokuwiki-mode-map (kbd "<S-tab>")
+       '(lambda () (interactive) (outline-cycle '(4))))
+     (define-key dokuwiki-mode-map (kbd "<M-S-right>") 'outline-demote)
+     (define-key dokuwiki-mode-map (kbd "<M-S-left>") 'outline-promote)
+     (define-key dokuwiki-mode-map (kbd "<M-up>") 'outline-move-subtree-up)
+     (define-key dokuwiki-mode-map (kbd "<M-down>") 'outline-move-subtree-down)
+     (add-hook 'dokuwiki-mode-hook 'dokuwiki-outline-magic-hook)
+     ;; Enable outline-magic features in `dokuwiki-mode' buffers
+     (dolist (buf (buffer-list))
+       (with-current-buffer buf
+         (when (eq major-mode 'dokuwiki-mode) (dokuwiki-outline-magic-hook))))
+     ))
+
+(defun dokuwiki-outline-magic-hook ()
+  "Hook to configure `outline-magic'."
+  (set (make-local-variable 'outline-promotion-headings)
+       '(("======" . 1) ("=====" . 2) ("====" . 3) ("===" . 4) ("==" . 5)))
+  (set (make-local-variable 'outline-cycle-emulate-tab) t))
+
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"
   "Major mode for DokuWiki document."

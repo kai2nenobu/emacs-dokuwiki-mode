@@ -175,6 +175,9 @@ See also `outline-level'."
   (set (make-local-variable 'font-lock-defaults)
        '(dokuwiki-font-lock-keywords
          nil nil ((?_ . "w")) nil))
+  (set (make-local-variable 'outline-regexp) dokuwiki-outline-regexp)
+  (set (make-local-variable 'outline-level) 'dokuwiki-outline-level)
+  (outline-minor-mode 1)
   )
 
 (provide 'dokuwiki-mode)

@@ -35,6 +35,12 @@
 
 (defvar dokuwiki-mode-map
   (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-n") 'outline-next-visible-heading)
+    (define-key map (kbd "C-c C-p") 'outline-previous-visible-heading)
+    (define-key map (kbd "C-c C-f") 'outline-forward-same-level)
+    (define-key map (kbd "C-c C-b") 'outline-backward-same-level)
+    (define-key map (kbd "C-c C-u") 'outline-up-heading)
+    (define-key map (kbd "C-c C-@") 'outline-mark-subtree)
     map)
   "Keymap for the `dokuwiki-mode'.")
 
@@ -157,8 +163,7 @@ See also `outline-regexp'.")
 
 (defun dokuwiki-outline-level ()
   "Compute a header's nesting level in `dokuwiki-mode'.
-See also `outline-level'.
-"
+See also `outline-level'."
   (when (looking-at outline-regexp)
     (let ((const 7)
           (headline (match-string 1)))

@@ -44,9 +44,6 @@
     map)
   "Keymap for the `dokuwiki-mode'.")
 
-(defvar dokuwiki-mode-hook nil
-  "dokuwiki-mode-hook.")
-
 (defvar dokuwiki-smiley-list
   '("8-)" "8-O" ":-(" ":-)" "=) " ":-/" ":-\\" ":-?" ":-D" ":-P" ":-O"
     ":-X" ":-|" ";-)" "^_^" ":?:" ":!:" "LOL" "FIXME" "DELETEME")

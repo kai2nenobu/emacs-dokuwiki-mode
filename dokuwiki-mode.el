@@ -3,7 +3,7 @@
 ;; Copyright (C)  2013, 2014 Tsunenobu Kai
 
 ;; Author: Tsunenobu Kai <kbkbkbkb1@gmail.com>
-;; URL: https://github.com/kbkbkbkb1/emacs-dokuwiki
+;; URL: https://github.com/kai2nenobu/emacs-dokuwiki-mode
 ;; Version: 0.1.0
 ;; Keywords: DokuWiki
 

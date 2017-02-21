@@ -26,10 +26,10 @@
 
 ;;; Code:
 
-(defgroup dokuwiki nil
+(defgroup dokuwiki-mode nil
   "Major mode for DokuWiki document."
   :group 'text
-  :prefix "dokuwiki"
+  :group 'dokuwiki
   :tag "DokuWiki"
   :link '(url-link "https://www.dokuwiki.org/dokuwiki"))
 

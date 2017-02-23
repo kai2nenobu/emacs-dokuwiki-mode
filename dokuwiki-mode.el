@@ -5,7 +5,7 @@
 ;; Author: Tsunenobu Kai <kbkbkbkb1@gmail.com>
 ;; URL: https://github.com/kai2nenobu/emacs-dokuwiki-mode
 ;; Version: 0.1.0
-;; Keywords: DokuWiki
+;; Keywords: hypermedia text DokuWiki
 
 ;; This file is not part of GNU Emacs.
 
@@ -26,10 +26,10 @@
 
 ;;; Code:
 
-(defgroup dokuwiki nil
+(defgroup dokuwiki-mode nil
   "Major mode for DokuWiki document."
   :group 'text
-  :prefix "dokuwiki"
+  :group 'dokuwiki
   :tag "DokuWiki"
   :link '(url-link "https://www.dokuwiki.org/dokuwiki"))
 

@@ -1,8 +1,8 @@
 ;;; dokuwiki-mode.el --- Major mode for DokuWiki document
 
-;; Copyright (C)  2013, 2014 Tsunenobu Kai
+;; Copyright (C)  2013-2017 Tsunenobu Kai
 
-;; Author: Tsunenobu Kai <kbkbkbkb1@gmail.com>
+;; Author: Tsunenobu Kai <kai2nenobu@gmail.com>
 ;; URL: https://github.com/kai2nenobu/emacs-dokuwiki-mode
 ;; Version: 0.1.0
 ;; Keywords: hypermedia text DokuWiki

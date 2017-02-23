@@ -4,7 +4,7 @@
 
 ;; Author: Tsunenobu Kai <kai2nenobu@gmail.com>
 ;; URL: https://github.com/kai2nenobu/emacs-dokuwiki-mode
-;; Version: 0.1.0
+;; Version: 0.1.1
 ;; Keywords: hypermedia text DokuWiki
 
 ;; This file is not part of GNU Emacs.

@@ -9,6 +9,8 @@ Major mode for DokuWiki document
 - [ ] Highlight multiline block
 - [ ] Improve behavior of ~outline-promote~ and ~outline-demote~
 * ChangeLog
+- Version 0.1.1
+  - Change =defgroup= group name to avoid conflicting with [[https://github.com/accidentalrebel/emacs-dokuwiki][dokuwiki.el]] ([[https://github.com/kai2nenobu/emacs-dokuwiki-mode/pull/3][#3]] thanks [[https://github.com/zonuexe][@zonuexe]])
 - Version 0.1.0
   - Enable ~outline-minor-mode~
   - Work with ~outline-magic~

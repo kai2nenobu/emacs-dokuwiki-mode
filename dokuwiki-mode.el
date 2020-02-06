@@ -41,6 +41,9 @@
     (define-key map (kbd "C-c C-b") 'outline-backward-same-level)
     (define-key map (kbd "C-c C-u") 'outline-up-heading)
     (define-key map (kbd "C-c C-@") 'outline-mark-subtree)
+    (define-key map (kbd "C-c C-t 1") 'dokuwiki-insert-header-1)
+    (define-key map (kbd "C-c C-t 2") 'dokuwiki-insert-header-2)
+    (define-key map (kbd "C-c C-t 3") 'dokuwiki-insert-header-3)
     map)
   "Keymap for the `dokuwiki-mode'.")
 
@@ -190,7 +193,8 @@ See also `outline-level'."
   (set (make-local-variable 'outline-cycle-emulate-tab) t))
 
 (defun dokuwiki-insert-header (&optional level text setext)
-  "This code is almost derived from markdown-mode.el"
+  "This code is derived from markdown-mode.el"
+  ;; TODO: rewrite
   (interactive "p\nsHeader text: ")
   (setq level (min (max (or level 1) 1) (if setext 2 6)))
   ;; Determine header text if not given
@@ -245,6 +249,17 @@ See also `outline-level'."
 (defun dokuwiki-insert-header-6 ()
 (interactive "*")
 (dokuwiki-insert-header 6))
+
+;; key bindings
+;; TODO: put correct place
+;; TODO: add relative insert-header(current-header,larger,smaller)
+
+(define-key dokuwiki-mode-map (kbd "C-c C-t 1") 'dokuwiki-insert-header-1)
+(define-key dokuwiki-mode-map (kbd "C-c C-t 2") 'dokuwiki-insert-header-2)
+(define-key dokuwiki-mode-map (kbd "C-c C-t 3") 'dokuwiki-insert-header-3)
+(define-key dokuwiki-mode-map (kbd "C-c C-t 4") 'dokuwiki-insert-header-4)
+(define-key dokuwiki-mode-map (kbd "C-c C-t 5") 'dokuwiki-insert-header-5)
+(define-key dokuwiki-mode-map (kbd "C-c C-t 6") 'dokuwiki-insert-header-6)
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"

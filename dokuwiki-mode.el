@@ -189,6 +189,63 @@ See also `outline-level'."
        '(("======" . 1) ("=====" . 2) ("====" . 3) ("===" . 4) ("==" . 5)))
   (set (make-local-variable 'outline-cycle-emulate-tab) t))
 
+(defun dokuwiki-insert-header (&optional level text setext)
+  "This code is almost derived from markdown-mode.el"
+  (interactive "p\nsHeader text: ")
+  (setq level (min (max (or level 1) 1) (if setext 2 6)))
+  ;; Determine header text if not given
+  (when (null text)
+    (if (markdown-use-region-p)
+        ;; Active region
+        (setq text (delete-and-extract-region (region-beginning) (region-end)))
+      ;; No active region
+      (markdown-remove-header)
+      (setq text (delete-and-extract-region
+                  (line-beginning-position) (line-end-position)))
+      (when (and setext (string-match-p "^[ \t]*$" text))
+        (setq text (read-string "Header text: "))))
+    (setq text (markdown-compress-whitespace-string text)))
+  ;; Insertion with given text
+  (markdown-ensure-blank-line-before)
+  (let (hdr)
+    (cond (setext
+           (setq hdr (make-string (string-width text) (if (= level 2) ?- ?=)))
+           (insert text "\n" hdr))
+          (t
+           (setq hdr (make-string level ?=))
+           (insert hdr " " text)
+           (when (null markdown-asymmetric-header) (insert " " hdr)))))
+  (markdown-ensure-blank-line-after)
+  ;; Leave point at end of text
+  (cond (setext
+         (backward-char (1+ (string-width text))))
+        ((null markdown-asymmetric-header)
+         (backward-char (1+ level)))))
+
+(defun dokuwiki-insert-header-1 ()
+(interactive "*")
+(dokuwiki-insert-header 1))
+
+(defun dokuwiki-insert-header-2 ()
+(interactive "*")
+(dokuwiki-insert-header 2))
+
+(defun dokuwiki-insert-header-3 ()
+(interactive "*")
+(dokuwiki-insert-header 3))
+
+(defun dokuwiki-insert-header-4 ()
+(interactive "*")
+(dokuwiki-insert-header 4))
+
+(defun dokuwiki-insert-header-5 ()
+(interactive "*")
+(dokuwiki-insert-header 5))
+
+(defun dokuwiki-insert-header-6 ()
+(interactive "*")
+(dokuwiki-insert-header 6))
+
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"
   "Major mode for DokuWiki document."

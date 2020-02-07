@@ -278,19 +278,47 @@ See also `outline-level'."
     (dokuwiki-insert-header (- current-level 1))
     ))
 
-(defun dokuwiki-insert-bold ()
-  (interactive)
-  (let ((delim (if markdown-bold-underscore "__" "**")))
+(defun dokuwiki-insert-base (before after)
     (if (use-region-p)
         ;; Active region
         (let ((bounds (markdown-unwrap-things-in-region
                        (region-beginning) (region-end)
                        markdown-regex-bold 2 4)))
-          (markdown-wrap-or-insert delim delim nil (car bounds) (cdr bounds)))
+          (markdown-wrap-or-insert before after nil (car bounds) (cdr bounds)))
       ;; Bold markup removal, bold word at point, or empty markup insertion
       (if (thing-at-point-looking-at markdown-regex-bold)
           (markdown-unwrap-thing-at-point nil 2 4)
-        (markdown-wrap-or-insert delim delim 'word nil nil)))))
+        (markdown-wrap-or-insert before after 'word nil nil))))
+
+(defun dokuwiki-insert-bold ()
+  (interactive)
+  (dokuwiki-insert-base "**" "**")
+  )
+
+(defun dokuwiki-insert-italic ()
+  (interactive)
+  (dokuwiki-insert-base "//" "//")
+  )
+
+(defun dokuwiki-insert-underline ()
+  (interactive)
+  (dokuwiki-insert-base "__" "__")
+  )
+
+(defun dokuwiki-insert-code ()
+  (interactive)
+  (dokuwiki-insert-base "''" "''")
+  )
+
+(defun dokuwiki-insert-deleteline ()
+  (interactive)
+  (dokuwiki-insert-base "<del>" "</del>")
+  )
+
+(defun dokuwiki-insert-link ()
+  (interactive)
+  (dokuwiki-insert-base "[[" "]]")
+  )
 
 ;; key bindings
 ;; TODO: put correct place
@@ -305,6 +333,11 @@ See also `outline-level'."
 (define-key dokuwiki-mode-map (kbd "C-c C-t 9") 'dokuwiki-insert-header-down-level)
 (define-key dokuwiki-mode-map (kbd "C-c C-t 0") 'dokuwiki-insert-header-up-level)
 (define-key dokuwiki-mode-map (kbd "C-c C-t b") 'dokuwiki-insert-bold)
+(define-key dokuwiki-mode-map (kbd "C-c C-t i") 'dokuwiki-insert-italic)
+(define-key dokuwiki-mode-map (kbd "C-c C-t u") 'dokuwiki-insert-underline)
+(define-key dokuwiki-mode-map (kbd "C-c C-t d") 'dokuwiki-insert-deleteline)
+(define-key dokuwiki-mode-map (kbd "C-c C-t m") 'dokuwiki-insert-code)
+(define-key dokuwiki-mode-map (kbd "C-c C-t l") 'dokuwiki-insert-link)
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"

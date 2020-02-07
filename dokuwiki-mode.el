@@ -202,17 +202,18 @@ See also `outline-level'."
   (set (make-local-variable 'outline-cycle-emulate-tab) t))
 
 (defun dokuwiki-insert-header (&optional level text setext)
-  "This code is derived from markdown-mode.el"
-  ;; TODO: rewrite
+  "This code is derived from markdown-insert-header in markdown-mode.el
+  "
+  ;; TODO: clear dependence of markdown-mode
   (interactive "p\nsHeader text: ")
   (setq level (min (max (or level 1) 1) (if setext 2 6)))
   ;; Determine header text if not given
   (when (null text)
-    (if (markdown-use-region-p)
+    (if (use-region-p)
         ;; Active region
         (setq text (delete-and-extract-region (region-beginning) (region-end)))
       ;; No active region
-      (markdown-remove-header)
+      ;; (markdown-remove-header)
       (setq text (delete-and-extract-region
                   (line-beginning-position) (line-end-position)))
       (when (and setext (string-match-p "^[ \t]*$" text))
@@ -275,7 +276,21 @@ See also `outline-level'."
   (interactive "*")
   (let ((current-level (dokuwiki-outline-level-for-insert-header)))
     (dokuwiki-insert-header (- current-level 1))
-))
+    ))
+
+(defun dokuwiki-insert-bold ()
+  (interactive)
+  (let ((delim (if markdown-bold-underscore "__" "**")))
+    (if (use-region-p)
+        ;; Active region
+        (let ((bounds (markdown-unwrap-things-in-region
+                       (region-beginning) (region-end)
+                       markdown-regex-bold 2 4)))
+          (markdown-wrap-or-insert delim delim nil (car bounds) (cdr bounds)))
+      ;; Bold markup removal, bold word at point, or empty markup insertion
+      (if (thing-at-point-looking-at markdown-regex-bold)
+          (markdown-unwrap-thing-at-point nil 2 4)
+        (markdown-wrap-or-insert delim delim 'word nil nil)))))
 
 ;; key bindings
 ;; TODO: put correct place
@@ -289,6 +304,7 @@ See also `outline-level'."
 (define-key dokuwiki-mode-map (kbd "C-c C-t 8") 'dokuwiki-insert-header-current-level)
 (define-key dokuwiki-mode-map (kbd "C-c C-t 9") 'dokuwiki-insert-header-down-level)
 (define-key dokuwiki-mode-map (kbd "C-c C-t 0") 'dokuwiki-insert-header-up-level)
+(define-key dokuwiki-mode-map (kbd "C-c C-t b") 'dokuwiki-insert-bold)
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"

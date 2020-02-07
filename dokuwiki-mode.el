@@ -169,6 +169,15 @@ See also `outline-level'."
           (headline (match-string 1)))
       (- const (length headline)))))
 
+(defun dokuwiki-outline-level-for-insert-header ()
+  "return outline level"
+(save-excursion
+   (end-of-line)
+   (if (re-search-backward "^=+" nil t)
+       (- (match-end 0) (match-beginning 0))
+     0)))
+;; DEBUG: strange regexp
+
 ;;;; Work with `outline-magic'
 (eval-after-load "outline-magic"
   '(progn

@@ -259,9 +259,26 @@ See also `outline-level'."
 (interactive "*")
 (dokuwiki-insert-header 6))
 
+(defun dokuwiki-insert-header-current-level ()
+  (interactive "*")
+  (let ((current-level (dokuwiki-outline-level-for-insert-header)))
+    (dokuwiki-insert-header current-level)
+    ))
+
+(defun dokuwiki-insert-header-up-level ()
+  (interactive "*")
+  (let ((current-level (dokuwiki-outline-level-for-insert-header)))
+    (dokuwiki-insert-header (+ current-level 1))
+    ))
+
+(defun dokuwiki-insert-header-down-level ()
+  (interactive "*")
+  (let ((current-level (dokuwiki-outline-level-for-insert-header)))
+    (dokuwiki-insert-header (- current-level 1))
+))
+
 ;; key bindings
 ;; TODO: put correct place
-;; TODO: add relative insert-header(current-header,larger,smaller)
 
 (define-key dokuwiki-mode-map (kbd "C-c C-t 1") 'dokuwiki-insert-header-1)
 (define-key dokuwiki-mode-map (kbd "C-c C-t 2") 'dokuwiki-insert-header-2)
@@ -269,6 +286,9 @@ See also `outline-level'."
 (define-key dokuwiki-mode-map (kbd "C-c C-t 4") 'dokuwiki-insert-header-4)
 (define-key dokuwiki-mode-map (kbd "C-c C-t 5") 'dokuwiki-insert-header-5)
 (define-key dokuwiki-mode-map (kbd "C-c C-t 6") 'dokuwiki-insert-header-6)
+(define-key dokuwiki-mode-map (kbd "C-c C-t 8") 'dokuwiki-insert-header-current-level)
+(define-key dokuwiki-mode-map (kbd "C-c C-t 9") 'dokuwiki-insert-header-down-level)
+(define-key dokuwiki-mode-map (kbd "C-c C-t 0") 'dokuwiki-insert-header-up-level)
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"

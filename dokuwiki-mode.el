@@ -44,6 +44,22 @@
     (define-key map (kbd "C-c C-t 1") 'dokuwiki-insert-header-1)
     (define-key map (kbd "C-c C-t 2") 'dokuwiki-insert-header-2)
     (define-key map (kbd "C-c C-t 3") 'dokuwiki-insert-header-3)
+    (define-key map (kbd "C-c C-t 1") 'dokuwiki-insert-header-1)
+    (define-key map (kbd "C-c C-t 2") 'dokuwiki-insert-header-2)
+    (define-key map (kbd "C-c C-t 3") 'dokuwiki-insert-header-3)
+    (define-key map (kbd "C-c C-t 4") 'dokuwiki-insert-header-4)
+    (define-key map (kbd "C-c C-t 5") 'dokuwiki-insert-header-5)
+    (define-key map (kbd "C-c C-t 6") 'dokuwiki-insert-header-6)
+    (define-key map (kbd "C-c C-t 8") 'dokuwiki-insert-header-current-level)
+    (define-key map (kbd "C-c C-t 9") 'dokuwiki-insert-header-down-level)
+    (define-key map (kbd "C-c C-t 0") 'dokuwiki-insert-header-up-level)
+    (define-key map (kbd "C-c C-t b") 'dokuwiki-insert-bold)
+    (define-key map (kbd "C-c C-t i") 'dokuwiki-insert-italic)
+    (define-key map (kbd "C-c C-t u") 'dokuwiki-insert-underline)
+    (define-key map (kbd "C-c C-t d") 'dokuwiki-insert-deleteline)
+    (define-key map (kbd "C-c C-t m") 'dokuwiki-insert-code)
+    (define-key map (kbd "C-c C-t l") 'dokuwiki-insert-link)
+    (define-key map (kbd "C-c C-t f") 'dokuwiki-insert-footnote)
     map)
   "Keymap for the `dokuwiki-mode'.")
 
@@ -320,24 +336,10 @@ See also `outline-level'."
   (dokuwiki-insert-base "[[" "]]")
   )
 
-;; key bindings
-;; TODO: put correct place
-
-(define-key dokuwiki-mode-map (kbd "C-c C-t 1") 'dokuwiki-insert-header-1)
-(define-key dokuwiki-mode-map (kbd "C-c C-t 2") 'dokuwiki-insert-header-2)
-(define-key dokuwiki-mode-map (kbd "C-c C-t 3") 'dokuwiki-insert-header-3)
-(define-key dokuwiki-mode-map (kbd "C-c C-t 4") 'dokuwiki-insert-header-4)
-(define-key dokuwiki-mode-map (kbd "C-c C-t 5") 'dokuwiki-insert-header-5)
-(define-key dokuwiki-mode-map (kbd "C-c C-t 6") 'dokuwiki-insert-header-6)
-(define-key dokuwiki-mode-map (kbd "C-c C-t 8") 'dokuwiki-insert-header-current-level)
-(define-key dokuwiki-mode-map (kbd "C-c C-t 9") 'dokuwiki-insert-header-down-level)
-(define-key dokuwiki-mode-map (kbd "C-c C-t 0") 'dokuwiki-insert-header-up-level)
-(define-key dokuwiki-mode-map (kbd "C-c C-t b") 'dokuwiki-insert-bold)
-(define-key dokuwiki-mode-map (kbd "C-c C-t i") 'dokuwiki-insert-italic)
-(define-key dokuwiki-mode-map (kbd "C-c C-t u") 'dokuwiki-insert-underline)
-(define-key dokuwiki-mode-map (kbd "C-c C-t d") 'dokuwiki-insert-deleteline)
-(define-key dokuwiki-mode-map (kbd "C-c C-t m") 'dokuwiki-insert-code)
-(define-key dokuwiki-mode-map (kbd "C-c C-t l") 'dokuwiki-insert-link)
+(defun dokuwiki-insert-footnote ()
+  (interactive)
+  (dokuwiki-insert-base "((" "))")
+  )
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"

@@ -66,6 +66,7 @@
     (define-key map (kbd "C-c C-t -") 'dokuwiki-insert-number-list)
     (define-key dokuwiki-mode-map (kbd "C-c C-t q") 'dokuwiki-insert-quote)
     (define-key dokuwiki-mode-map (kbd "C-c C-t r") 'dokuwiki-insert-rss)
+    (define-key dokuwiki-mode-map (kbd "C-c C-t h") 'dokuwiki-insert-hr)
     map)
   "Keymap for the `dokuwiki-mode'.")
 
@@ -375,6 +376,12 @@ See also `outline-level'."
 (defun dokuwiki-insert-rss ()
   (interactive)
   (dokuwiki-insert-base "{{rss>" " 10 author date 1h}}")
+  )
+
+(defun dokuwiki-insert-hr ()
+  ;; TODO: add case of active region.
+  (interactive)
+  (insert "------")
   )
 
 ;;;###autoload

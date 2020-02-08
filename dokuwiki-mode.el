@@ -44,9 +44,6 @@
     (define-key map (kbd "C-c C-t 1") 'dokuwiki-insert-header-1)
     (define-key map (kbd "C-c C-t 2") 'dokuwiki-insert-header-2)
     (define-key map (kbd "C-c C-t 3") 'dokuwiki-insert-header-3)
-    (define-key map (kbd "C-c C-t 1") 'dokuwiki-insert-header-1)
-    (define-key map (kbd "C-c C-t 2") 'dokuwiki-insert-header-2)
-    (define-key map (kbd "C-c C-t 3") 'dokuwiki-insert-header-3)
     (define-key map (kbd "C-c C-t 4") 'dokuwiki-insert-header-4)
     (define-key map (kbd "C-c C-t 5") 'dokuwiki-insert-header-5)
     (define-key map (kbd "C-c C-t 6") 'dokuwiki-insert-header-6)
@@ -59,14 +56,15 @@
     (define-key map (kbd "C-c C-t d") 'dokuwiki-insert-deleteline)
     (define-key map (kbd "C-c C-t m") 'dokuwiki-insert-code)
     (define-key map (kbd "C-c C-t c") 'dokuwiki-insert-code-block)
-    (define-key dokuwiki-mode-map (kbd "C-c C-t C-c") 'dokuwiki-insert-code-file)
+    (define-key map (kbd "C-c C-t o") 'dokuwiki-insert-code-file)
+
     (define-key map (kbd "C-c C-t l") 'dokuwiki-insert-link)
     (define-key map (kbd "C-c C-t f") 'dokuwiki-insert-footnote)
-    (define-key map (kbd "C-c C-t .") 'dokuwiki-insert-list)
+    (define-key map (kbd "M-RET") 'dokuwiki-insert-list)
     (define-key map (kbd "C-c C-t -") 'dokuwiki-insert-number-list)
-    (define-key dokuwiki-mode-map (kbd "C-c C-t q") 'dokuwiki-insert-quote)
-    (define-key dokuwiki-mode-map (kbd "C-c C-t r") 'dokuwiki-insert-rss)
-    (define-key dokuwiki-mode-map (kbd "C-c C-t h") 'dokuwiki-insert-hr)
+    (define-key map (kbd "C-c C-t q") 'dokuwiki-insert-quote)
+    (define-key map (kbd "C-c C-t r") 'dokuwiki-insert-rss)
+    (define-key map (kbd "C-c C-t h") 'dokuwiki-insert-hr)
     map)
   "Keymap for the `dokuwiki-mode'.")
 
@@ -260,43 +258,43 @@ See also `outline-level'."
          (backward-char (1+ level)))))
 
 (defun dokuwiki-insert-header-1 ()
-(interactive "*")
+(interactive)
 (dokuwiki-insert-header 1))
 
 (defun dokuwiki-insert-header-2 ()
-(interactive "*")
+(interactive)
 (dokuwiki-insert-header 2))
 
 (defun dokuwiki-insert-header-3 ()
-(interactive "*")
+(interactive)
 (dokuwiki-insert-header 3))
 
 (defun dokuwiki-insert-header-4 ()
-(interactive "*")
+(interactive)
 (dokuwiki-insert-header 4))
 
 (defun dokuwiki-insert-header-5 ()
-(interactive "*")
+(interactive)
 (dokuwiki-insert-header 5))
 
 (defun dokuwiki-insert-header-6 ()
-(interactive "*")
+(interactive)
 (dokuwiki-insert-header 6))
 
 (defun dokuwiki-insert-header-current-level ()
-  (interactive "*")
+  (interactive)
   (let ((current-level (dokuwiki-outline-level-for-insert-header)))
     (if (= current-level 0) (dokuwiki-insert-header 6)
       (dokuwiki-insert-header current-level))))
 
 (defun dokuwiki-insert-header-up-level ()
-  (interactive "*")
+  (interactive)
   (let ((current-level (dokuwiki-outline-level-for-insert-header)))
     (if (= current-level 0) (dokuwiki-insert-header 6)
       (dokuwiki-insert-header (+ current-level 1)))))
 
 (defun dokuwiki-insert-header-down-level ()
-  (interactive "*")
+  (interactive)
   (let ((current-level (dokuwiki-outline-level-for-insert-header)))
     (if (= current-level 0) (dokuwiki-insert-header 6)
     (dokuwiki-insert-header (- current-level 1)))))
@@ -315,74 +313,61 @@ See also `outline-level'."
 
 (defun dokuwiki-insert-bold ()
   (interactive)
-  (dokuwiki-insert-base "**" "**")
-  )
+  (dokuwiki-insert-base "**" "**"))
 
 (defun dokuwiki-insert-italic ()
   (interactive)
-  (dokuwiki-insert-base "//" "//")
-  )
+  (dokuwiki-insert-base "//" "//"))
 
 (defun dokuwiki-insert-underline ()
   (interactive)
-  (dokuwiki-insert-base "__" "__")
-  )
+  (dokuwiki-insert-base "__" "__"))
 
 (defun dokuwiki-insert-code ()
   (interactive)
-  (dokuwiki-insert-base "''" "''")
-  )
+  (dokuwiki-insert-base "''" "''"))
 
 (defun dokuwiki-insert-code-block ()
   (interactive)
-  (dokuwiki-insert-base "<code>\n" "\n</code>")
-  )
+  (dokuwiki-insert-base "<code>\n" "\n</code>"))
 
 (defun dokuwiki-insert-code-file ()
   (interactive)
-  (dokuwiki-insert-base "<file lang file>\n" "\n</file>")
-  )
+  (dokuwiki-insert-base "<file lang file>\n" "\n</file>"))
 
 (defun dokuwiki-insert-deleteline ()
   (interactive)
-  (dokuwiki-insert-base "<del>" "</del>")
-  )
+  (dokuwiki-insert-base "<del>" "</del>"))
 
 (defun dokuwiki-insert-link ()
   (interactive)
-  (dokuwiki-insert-base "[[" "]]")
-  )
+  (dokuwiki-insert-base "[[" "]]"))
 
 (defun dokuwiki-insert-footnote ()
   (interactive)
-  (dokuwiki-insert-base "((" "))")
-  )
+  (dokuwiki-insert-base "((" "))"))
 
 (defun dokuwiki-insert-number-list ()
   (interactive)
-  (dokuwiki-insert-base "  - " "")
-  )
+  (dokuwiki-insert-base "  - " ""))
 
 (defun dokuwiki-insert-list ()
+  ;; TODO: need to rewrite
   (interactive)
-  (dokuwiki-insert-base "  * " "")
-  )
+  (dokuwiki-insert-base "  * " ""))
 
 (defun dokuwiki-insert-quote ()
   (interactive)
-  (dokuwiki-insert-base "> " "")
-  )
+  (dokuwiki-insert-base "> " ""))
 
 (defun dokuwiki-insert-rss ()
   (interactive)
-  (dokuwiki-insert-base "{{rss>" " 10 author date 1h}}")
-  )
+  (dokuwiki-insert-base "{{rss>" " 10 author date 1h}}"))
 
 (defun dokuwiki-insert-hr ()
   ;; TODO: add case of active region.
   (interactive)
-  (insert "------")
-  )
+  (insert "------"))
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"

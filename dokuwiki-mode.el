@@ -58,10 +58,14 @@
     (define-key map (kbd "C-c C-t u") 'dokuwiki-insert-underline)
     (define-key map (kbd "C-c C-t d") 'dokuwiki-insert-deleteline)
     (define-key map (kbd "C-c C-t m") 'dokuwiki-insert-code)
+    (define-key map (kbd "C-c C-t c") 'dokuwiki-insert-code-block)
+    (define-key dokuwiki-mode-map (kbd "C-c C-t C-c") 'dokuwiki-insert-code-file)
     (define-key map (kbd "C-c C-t l") 'dokuwiki-insert-link)
     (define-key map (kbd "C-c C-t f") 'dokuwiki-insert-footnote)
     (define-key map (kbd "C-c C-t .") 'dokuwiki-insert-list)
     (define-key map (kbd "C-c C-t -") 'dokuwiki-insert-number-list)
+    (define-key dokuwiki-mode-map (kbd "C-c C-t q") 'dokuwiki-insert-quote)
+    (define-key dokuwiki-mode-map (kbd "C-c C-t r") 'dokuwiki-insert-rss)
     map)
   "Keymap for the `dokuwiki-mode'.")
 
@@ -188,7 +192,7 @@ See also `outline-level'."
       (- const (length headline)))))
 
 (defun dokuwiki-outline-level-for-insert-header ()
-  "return outline level"
+  "Return outline level. If not have level"
 (save-excursion
    (end-of-line)
    (if (re-search-backward "^=+" nil t)
@@ -281,20 +285,20 @@ See also `outline-level'."
 (defun dokuwiki-insert-header-current-level ()
   (interactive "*")
   (let ((current-level (dokuwiki-outline-level-for-insert-header)))
-    (dokuwiki-insert-header current-level)
-    ))
+    (if (= current-level 0) (dokuwiki-insert-header 6)
+      (dokuwiki-insert-header current-level))))
 
 (defun dokuwiki-insert-header-up-level ()
   (interactive "*")
   (let ((current-level (dokuwiki-outline-level-for-insert-header)))
-    (dokuwiki-insert-header (+ current-level 1))
-    ))
+    (if (= current-level 0) (dokuwiki-insert-header 6)
+      (dokuwiki-insert-header (+ current-level 1)))))
 
 (defun dokuwiki-insert-header-down-level ()
   (interactive "*")
   (let ((current-level (dokuwiki-outline-level-for-insert-header)))
-    (dokuwiki-insert-header (- current-level 1))
-    ))
+    (if (= current-level 0) (dokuwiki-insert-header 6)
+    (dokuwiki-insert-header (- current-level 1)))))
 
 (defun dokuwiki-insert-base (before after)
     (if (use-region-p)
@@ -328,6 +332,16 @@ See also `outline-level'."
   (dokuwiki-insert-base "''" "''")
   )
 
+(defun dokuwiki-insert-code-block ()
+  (interactive)
+  (dokuwiki-insert-base "<code>\n" "\n</code>")
+  )
+
+(defun dokuwiki-insert-code-file ()
+  (interactive)
+  (dokuwiki-insert-base "<file lang file>\n" "\n</file>")
+  )
+
 (defun dokuwiki-insert-deleteline ()
   (interactive)
   (dokuwiki-insert-base "<del>" "</del>")
@@ -351,6 +365,16 @@ See also `outline-level'."
 (defun dokuwiki-insert-list ()
   (interactive)
   (dokuwiki-insert-base "  * " "")
+  )
+
+(defun dokuwiki-insert-quote ()
+  (interactive)
+  (dokuwiki-insert-base "> " "")
+  )
+
+(defun dokuwiki-insert-rss ()
+  (interactive)
+  (dokuwiki-insert-base "{{rss>" " 10 author date 1h}}")
   )
 
 ;;;###autoload

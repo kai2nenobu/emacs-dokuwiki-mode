@@ -60,6 +60,8 @@
     (define-key map (kbd "C-c C-t m") 'dokuwiki-insert-code)
     (define-key map (kbd "C-c C-t l") 'dokuwiki-insert-link)
     (define-key map (kbd "C-c C-t f") 'dokuwiki-insert-footnote)
+    (define-key map (kbd "C-c C-t .") 'dokuwiki-insert-list)
+    (define-key map (kbd "C-c C-t -") 'dokuwiki-insert-number-list)
     map)
   "Keymap for the `dokuwiki-mode'.")
 
@@ -339,6 +341,16 @@ See also `outline-level'."
 (defun dokuwiki-insert-footnote ()
   (interactive)
   (dokuwiki-insert-base "((" "))")
+  )
+
+(defun dokuwiki-insert-number-list ()
+  (interactive)
+  (dokuwiki-insert-base "  - " "")
+  )
+
+(defun dokuwiki-insert-list ()
+  (interactive)
+  (dokuwiki-insert-base "  * " "")
   )
 
 ;;;###autoload

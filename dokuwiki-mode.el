@@ -57,7 +57,6 @@
     (define-key map (kbd "C-c C-t m") 'dokuwiki-insert-code)
     (define-key map (kbd "C-c C-t c") 'dokuwiki-insert-code-block)
     (define-key map (kbd "C-c C-t o") 'dokuwiki-insert-code-file)
-
     (define-key map (kbd "C-c C-t l") 'dokuwiki-insert-link)
     (define-key map (kbd "C-c C-t f") 'dokuwiki-insert-footnote)
     (define-key map (kbd "M-RET") 'dokuwiki-insert-list)
@@ -76,6 +75,10 @@
 (defvar dokuwiki-outline-regexp " ?\\(=\\{2,6\\}\\)"
   "Regexp which indicates headline in DokuWiki.
 See also `outline-regexp'.")
+
+(defvar dokuwiki-regex-blank-line
+  "^[[:blank:]]*$"
+  "Regular expression that matches a blank line.")
 
 ;;;; Faces
 (defface dokuwiki-box '((t (:box t)))
@@ -191,7 +194,7 @@ See also `outline-level'."
       (- const (length headline)))))
 
 (defun dokuwiki-outline-level-for-insert-header ()
-  "Return outline level. If not have level"
+  "Return outline level. "
 (save-excursion
    (end-of-line)
    (if (re-search-backward "^=+" nil t)
@@ -368,6 +371,12 @@ See also `outline-level'."
   ;; TODO: add case of active region.
   (interactive)
   (insert "------"))
+
+(defun dokuwiki-cur-line-blank-p ()
+  "Return t if the current line is blank and nil otherwise."
+  (save-excursion
+    (beginning-of-line)
+    (looking-at-p dokuwiki-regex-blank-line)))
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"

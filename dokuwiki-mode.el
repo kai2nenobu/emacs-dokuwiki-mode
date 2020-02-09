@@ -355,9 +355,13 @@ See also `outline-level'."
   (dokuwiki-insert-base "  - " ""))
 
 (defun dokuwiki-insert-list ()
-  ;; TODO: need to rewrite
+  ;; TODO: discrimination ordered-list or non-list
   (interactive)
-  (dokuwiki-insert-base "  * " ""))
+  (let (indent)
+    (progn
+      (unless (markdown-cur-line-blank-p)
+	(insert "\n"))
+      (insert markdown-unordered-list-item-prefix))))
 
 (defun dokuwiki-insert-quote ()
   (interactive)

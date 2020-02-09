@@ -355,13 +355,27 @@ See also `outline-level'."
   (dokuwiki-insert-base "  - " ""))
 
 (defun dokuwiki-insert-list ()
-  ;; TODO: discrimination ordered-list or non-list
   (interactive)
-  (let (indent)
-    (progn
-      (unless (markdown-cur-line-blank-p)
-	(insert "\n"))
-      (insert markdown-unordered-list-item-prefix))))
+  (let (mark search-limit-point)
+    ;; get search-limit-point
+    (save-excursion
+      (progn
+	(end-of-line)
+	(setq search-limit-point (point))
+	))
+    ;; search order or non-order list
+    (save-excursion
+      (if (dokuwiki-cur-line-blank-p)
+	  (forward-line -1))
+      (beginning-of-line)
+      (if (search-forward "  #" search-limit-point t)
+	     (setq mark "  # ")
+	(setq mark "  * ")))
+    ;; insert
+  (progn
+    (unless (dokuwiki-cur-line-blank-p)
+      (insert "\n"))
+    (insert mark))))
 
 (defun dokuwiki-insert-quote ()
   (interactive)

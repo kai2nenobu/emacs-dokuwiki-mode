@@ -368,8 +368,8 @@ See also `outline-level'."
       (if (dokuwiki-cur-line-blank-p)
 	  (forward-line -1))
       (beginning-of-line)
-      (if (search-forward "  #" search-limit-point t)
-	     (setq mark "  # ")
+      (if (search-forward "  -" search-limit-point t)
+	     (setq mark "  - ")
 	(setq mark "  * ")))
     ;; insert
   (progn

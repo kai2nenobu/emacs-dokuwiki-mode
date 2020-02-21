@@ -303,7 +303,8 @@ See also `outline-level'."
     (dokuwiki-insert-header (- current-level 1)))))
 
 (defun dokuwiki-insert-base (before after)
-    (if (use-region-p)
+  (if (use-region-p)
+      ;; TODO: what is regex-bold?
         ;; Active region
         (let ((bounds (markdown-unwrap-things-in-region
                        (region-beginning) (region-end)
@@ -386,8 +387,9 @@ See also `outline-level'."
   (dokuwiki-insert-base "{{rss>" " 10 author date 1h}}"))
 
 (defun dokuwiki-insert-hr ()
-  ;; TODO: add case of active region.
   (interactive)
+  (when (thing-at-point-looking-at "------")
+    (delete-region (match-beginning 0) (match-end 0)))
   (insert "------"))
 
 (defun dokuwiki-cur-line-blank-p ()

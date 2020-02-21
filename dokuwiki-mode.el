@@ -242,7 +242,7 @@ See also `outline-level'."
                   (line-beginning-position) (line-end-position)))
       (when (and setext (string-match-p "^[ \t]*$" text))
         (setq text (read-string "Header text: "))))
-    (setq text (markdown-compress-whitespace-string text)))
+    (setq text (dokuwiki-compress-whitespace-string text)))
   ;; Insertion with given text
   (markdown-ensure-blank-line-before)
   (let (hdr)
@@ -304,7 +304,7 @@ See also `outline-level'."
 
 (defun dokuwiki-insert-base (before after)
   (if (use-region-p)
-      ;; TODO: what is regex-bold?
+      ;; TODO: what is regex-bold? why?
         ;; Active region
         (let ((bounds (markdown-unwrap-things-in-region
                        (region-beginning) (region-end)
@@ -397,6 +397,13 @@ See also `outline-level'."
   (save-excursion
     (beginning-of-line)
     (looking-at-p dokuwiki-regex-blank-line)))
+
+(defun dokuwiki-compress-whitespace-string (str)
+   "Compress whitespace in STR and return result.
+Leading and trailing whitespace is removed.  Sequences of multiple
+spaces, tabs, and newlines are replaced with single spaces. Derived from dokuwiki.el"
+  (markdown-replace-regexp-in-string "\\(^[ \t\n]+\\|[ \t\n]+$\\)" ""
+				     (markdown-replace-regexp-in-string "[ \t\n]+" " " str)))
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"

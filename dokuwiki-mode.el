@@ -237,14 +237,14 @@ See also `outline-level'."
         ;; Active region
         (setq text (delete-and-extract-region (region-beginning) (region-end)))
       ;; No active region
-      ;; (markdown-remove-header)
+      ;; (markdown-remove-header) ; TODO: If point is at a header, remove header
       (setq text (delete-and-extract-region
                   (line-beginning-position) (line-end-position)))
       (when (and setext (string-match-p "^[ \t]*$" text))
         (setq text (read-string "Header text: "))))
     (setq text (dokuwiki-compress-whitespace-string text)))
   ;; Insertion with given text
-  (markdown-ensure-blank-line-before)
+  (dokuwiki-ensure-blank-line-before)
   (let (hdr)
     (cond (setext
            (setq hdr (make-string (string-width text) (if (= level 2) ?- ?=)))
@@ -253,7 +253,7 @@ See also `outline-level'."
            (setq hdr (make-string level ?=))
            (insert hdr " " text)
            (when (null markdown-asymmetric-header) (insert " " hdr)))))
-  (markdown-ensure-blank-line-after)
+  (dokuwiki-ensure-blank-line-after)
   ;; Leave point at end of text
   (cond (setext
          (backward-char (1+ (string-width text))))
@@ -392,6 +392,8 @@ See also `outline-level'."
     (delete-region (match-beginning 0) (match-end 0)))
   (insert "------"))
 
+; Tools
+
 (defun dokuwiki-cur-line-blank-p ()
   "Return t if the current line is blank and nil otherwise."
   (save-excursion
@@ -404,6 +406,18 @@ Leading and trailing whitespace is removed.  Sequences of multiple
 spaces, tabs, and newlines are replaced with single spaces. Derived from dokuwiki.el"
   (markdown-replace-regexp-in-string "\\(^[ \t\n]+\\|[ \t\n]+$\\)" ""
 				     (markdown-replace-regexp-in-string "[ \t\n]+" " " str)))
+
+(defun dokuwiki-ensure-blank-line-before ()
+  "If previous line is not already blank, insert a blank line before point."
+  (unless (bolp) (insert "\n"))
+  (unless (or (bobp) (looking-back "\n\\s-*\n" nil)) (insert "\n")))
+
+(defun dokuwiki-ensure-blank-line-after ()
+  "If following line is not already blank, insert a blank line after point.
+Return the point where it was originally."
+  (save-excursion
+    (unless (eolp) (insert "\n"))
+    (unless (or (eobp) (looking-at-p "\n\\s-*\n")) (insert "\n"))))
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"

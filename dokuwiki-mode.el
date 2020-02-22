@@ -237,7 +237,6 @@ See also `outline-level'."
         ;; Active region
         (setq text (delete-and-extract-region (region-beginning) (region-end)))
       ;; No active region
-      ;; (markdown-remove-header) ; TODO: If point is at a header, remove header
       (setq text (delete-and-extract-region
                   (line-beginning-position) (line-end-position)))
       (when (and setext (string-match-p "^[ \t]*$" text))
@@ -252,12 +251,12 @@ See also `outline-level'."
           (t
            (setq hdr (make-string level ?=))
            (insert hdr " " text)
-           (when (null markdown-asymmetric-header) (insert " " hdr)))))
+           (insert " " hdr))))
   (dokuwiki-ensure-blank-line-after)
   ;; Leave point at end of text
   (cond (setext
          (backward-char (1+ (string-width text))))
-        ((null markdown-asymmetric-header)
+        (
          (backward-char (1+ level)))))
 
 (defun dokuwiki-insert-header-1 ()
@@ -404,8 +403,8 @@ See also `outline-level'."
    "Compress whitespace in STR and return result.
 Leading and trailing whitespace is removed.  Sequences of multiple
 spaces, tabs, and newlines are replaced with single spaces. Derived from dokuwiki.el"
-  (markdown-replace-regexp-in-string "\\(^[ \t\n]+\\|[ \t\n]+$\\)" ""
-				     (markdown-replace-regexp-in-string "[ \t\n]+" " " str)))
+  (replace-regexp-in-string "\\(^[ \t\n]+\\|[ \t\n]+$\\)" ""
+				     (replace-regexp-in-string "[ \t\n]+" " " str)))
 
 (defun dokuwiki-ensure-blank-line-before ()
   "If previous line is not already blank, insert a blank line before point."

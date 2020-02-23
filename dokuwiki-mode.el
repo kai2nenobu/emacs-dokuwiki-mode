@@ -376,7 +376,7 @@ See also `outline-level'."
 
 (defun dokuwiki-insert-hr ()
   (interactive)
-  (when (thing-at-point-looking-at "------")
+  (when (looking-at-p "------")
     (delete-region (match-beginning 0) (match-end 0)))
   (insert "------")
   (beginning-of-line))
@@ -432,7 +432,7 @@ and S1 and S2 were only inserted."
             new-point (+ (point) (length s1))))
      ;; Thing (word) at point
 	 ;; TODO: dependancy!!
-     ((setq bounds (markdown-bounds-of-thing-at-point (or thing 'word)))
+     ((setq bounds (bounds-of-thing-at-point (or thing 'word)))
       (setq a (car bounds)
             b (cdr bounds)
             new-point (+ (point) (length s1))))

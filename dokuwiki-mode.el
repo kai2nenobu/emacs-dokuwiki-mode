@@ -302,17 +302,7 @@ See also `outline-level'."
     (dokuwiki-insert-header (- current-level 1)))))
 
 (defun dokuwiki-insert-base (before after)
-  (if (use-region-p)
-      ;; TODO: what is regex-bold? why?
-        ;; Active region
-        (let ((bounds (markdown-unwrap-things-in-region
-                       (region-beginning) (region-end)
-                       markdown-regex-bold 2 4)))
-          (markdown-wrap-or-insert before after nil (car bounds) (cdr bounds)))
-      ;; Bold markup removal, bold word at point, or empty markup insertion
-      (if (thing-at-point-looking-at markdown-regex-bold)
-          (markdown-unwrap-thing-at-point nil 2 4)
-        (markdown-wrap-or-insert before after 'word nil nil))))
+  (markdown-wrap-or-insert before after 'word nil nil))
 
 (defun dokuwiki-insert-bold ()
   (interactive)

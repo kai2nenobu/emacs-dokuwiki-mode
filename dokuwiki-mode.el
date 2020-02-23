@@ -228,7 +228,6 @@ See also `outline-level'."
 (defun dokuwiki-insert-header (&optional level text setext)
   "This code is derived from markdown-insert-header in markdown-mode.el
   "
-  ;; TODO: clear dependence of markdown-mode
   (interactive "p\nsHeader text: ")
   (setq level (min (max (or level 1) 1) (if setext 2 6)))
   ;; Determine header text if not given
@@ -302,7 +301,7 @@ See also `outline-level'."
     (dokuwiki-insert-header (- current-level 1)))))
 
 (defun dokuwiki-insert-base (before after)
-  (markdown-wrap-or-insert before after 'word nil nil))
+  (dokuwiki-wrap-or-insert before after 'word nil nil))
 
 (defun dokuwiki-insert-bold ()
   (interactive)
@@ -379,9 +378,10 @@ See also `outline-level'."
   (interactive)
   (when (thing-at-point-looking-at "------")
     (delete-region (match-beginning 0) (match-end 0)))
-  (insert "------"))
+  (insert "------")
+  (beginning-of-line))
 
-; Tools
+;;; Tools -----------------------------------------------------------
 
 (defun dokuwiki-cur-line-blank-p ()
   "Return t if the current line is blank and nil otherwise."
@@ -407,6 +407,48 @@ Return the point where it was originally."
   (save-excursion
     (unless (eolp) (insert "\n"))
     (unless (or (eobp) (looking-at-p "\n\\s-*\n")) (insert "\n"))))
+
+(defun dokuwiki-wrap-or-insert (s1 s2 &optional thing beg end)
+  "Insert the strings S1 and S2, wrapping around region or THING.
+If a region is specified by the optional BEG and END arguments,
+wrap the strings S1 and S2 around that region.
+If there is an active region, wrap the strings S1 and S2 around
+the region.  If there is not an active region but the point is at
+THING, wrap that thing (which defaults to word).  Otherwise, just
+insert S1 and S2 and place the point in between.  Return the
+bounds of the entire wrapped string, or nil if nothing was wrapped
+and S1 and S2 were only inserted."
+  (let (a b bounds new-point)
+    (cond
+     ;; Given region
+     ((and beg end)
+      (setq a beg
+            b end
+            new-point (+ (point) (length s1))))
+     ;; Active region
+     ((use-region-p)
+      (setq a (region-beginning)
+            b (region-end)
+            new-point (+ (point) (length s1))))
+     ;; Thing (word) at point
+	 ;; TODO: dependancy!!
+     ((setq bounds (markdown-bounds-of-thing-at-point (or thing 'word)))
+      (setq a (car bounds)
+            b (cdr bounds)
+            new-point (+ (point) (length s1))))
+     ;; No active region and no word
+     (t
+      (setq a (point)
+            b (point))))
+    (goto-char b)
+    (insert s2)
+    (goto-char a)
+    (insert s1)
+    (when new-point (goto-char new-point))
+    (if (= a b)
+        nil
+      (setq b (+ b (length s1) (length s2)))
+      (cons a b))))
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"

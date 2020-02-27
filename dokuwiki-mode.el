@@ -358,13 +358,16 @@ See also `outline-level'."
 	  (forward-line -1))
       (beginning-of-line)
       (if (search-forward "  -" search-limit-point t)
-	     (setq mark "  - ")
-	(setq mark "  * ")))
+	     (setq mark "- ")
+		(setq mark "* ")))
+	;; indent
+	(setq indent 2)
+	(setq new-indent (make-string indent 32))
     ;; insert
   (progn
     (unless (dokuwiki-cur-line-blank-p)
       (insert "\n"))
-    (insert mark))))
+    (insert (concat new-indent mark)))))
 
 (defun dokuwiki-insert-quote ()
   (interactive)

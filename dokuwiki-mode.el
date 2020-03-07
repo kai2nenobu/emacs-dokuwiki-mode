@@ -343,31 +343,113 @@ See also `outline-level'."
   (interactive)
   (dokuwiki-insert-base "  - " ""))
 
-(defun dokuwiki-insert-list ()
-  (interactive)
-  (let (mark search-limit-point)
-    ;; get search-limit-point
-    (save-excursion
-      (progn
-	(end-of-line)
-	(setq search-limit-point (point))
-	))
-    ;; search order or non-order list
-    (save-excursion
-      (if (dokuwiki-cur-line-blank-p)
-	  (forward-line -1))
-      (beginning-of-line)
-      (if (search-forward "  -" search-limit-point t)
-	     (setq mark "- ")
-		(setq mark "* ")))
-	;; indent
-	(setq indent 2)
-	(setq new-indent (make-string indent 32))
-    ;; insert
-  (progn
-    (unless (dokuwiki-cur-line-blank-p)
-      (insert "\n"))
-    (insert (concat new-indent mark)))))
+;; (defun dokuwiki-insert-list ()
+;;   (interactive)
+;;   (let (mark search-limit-point)
+;;     ;; get search-limit-point
+;;     (save-excursion
+;;       (progn
+;; 	(end-of-line)
+;; 	(setq search-limit-point (point))
+;; 	))
+;;     ;; search order or non-order list
+;;     (save-excursion
+;;       (if (dokuwiki-cur-line-blank-p)
+;; 	  (forward-line -1)
+;; 	)
+;;       (beginning-of-line)
+;;       (if (search-forward "  -" search-limit-point t)
+;; 	     (setq mark "- ")
+;; 		(setq mark "* ")))
+;; 	;; indent
+;; 	(setq indent 2)
+;; 	(setq new-indent (make-string indent 32))
+;;     ;; insert
+;;   (progn
+;;     (unless (dokuwiki-cur-line-blank-p)
+;;       (insert "\n"))
+;;     (insert (concat new-indent mark)))))
+
+;; インデント保持はされてるけど、リストマークが保持されていない。*になる。なんで。書いてあるのと違う...記法が微妙に違うためか。
+(defun dokuwiki-insert-list (&optional arg)
+  "Insert a new list item.
+If the point is inside unordered list, insert a bullet mark.  If
+the point is inside ordered list, insert the next number followed
+by a period.  Use the previous list item to determine the amount
+of whitespace to place before and after list markers.
+
+With a \\[universal-argument] prefix (i.e., when ARG is (4)),
+decrease the indentation by one level.
+
+With two \\[universal-argument] prefixes (i.e., when ARG is (16)),
+increase the indentation by one level."
+  (interactive "p")
+  (let (bounds cur-indent marker indent new-indent new-loc)
+    (save-match-data
+      ;; Look for a list item on current or previous non-blank line
+	  ;; 各種代入
+      (save-excursion
+        (while (and (not (setq bounds (markdown-cur-list-item-bounds))) ; boundsはlist-itemの各種情報、現在行で
+                    (not (bobp))
+                    (markdown-cur-line-blank-p))
+          (forward-line -1))) ; 辿って、一番最後に使われたmarkerがあると止まる
+
+      (when bounds ; boundsがあるとき...
+        (cond ((save-excursion
+                 (skip-chars-backward " \t") ; インデントを飛ばして移動
+                 (looking-at-p markdown-regex-list)) ; listをサーチ
+               (beginning-of-line)
+               (insert "\n")
+               (forward-line -1)) ; カーソルを戻すバージョン？
+              ((not (markdown-cur-line-blank-p)) ; 空白でないときはnewline？(違いがわからなん)
+               (newline)))
+        (setq new-loc (point)))
+
+	  ;; 次の非空白行のリストでboundsを定義する
+      ;; Look ahead for a list item on next non-blank line
+      (unless bounds
+        (save-excursion
+          (while (and (null bounds)
+                      (not (eobp)) ; バッファの最後ではない
+                      (markdown-cur-line-blank-p)) ; 空行である
+            (forward-line)				; 次の行に進む…*while内。
+            (setq bounds (markdown-cur-list-item-bounds)))) ; boundsが定義されると抜ける
+        (when bounds
+          (setq new-loc (point))
+          (unless (markdown-cur-line-blank-p) ; 空白でないとき、新しい行。
+            (newline))))
+
+      (if (not bounds) ; boundsがないとき。インデントなどがあり大きくなっている。ここじゃないときはインデント使わないってことだよな…。new-locがあるので、上のwhenかunlessのどちらかは確実に評価されることになる。
+          ;; When not in a list, start a new unordered one
+          (progn
+            (unless (markdown-cur-line-blank-p)
+              (insert "\n"))
+            (insert markdown-unordered-list-item-prefix))
+        ;; Compute indentation and marker for new list item
+        (setq cur-indent (nth 2 bounds))
+        (setq marker (nth 4 bounds))	; markerは何？ -- * とか + とかか。マーク。
+        (when (nth 5 bounds)
+          (setq marker
+                (concat marker
+                        (replace-regexp-in-string "[Xx]" " " (nth 5 bounds)))))
+
+        ;; If current item is a GFM checkbox, insert new unchecked checkbox.
+        (cond
+
+         ;; Indent: increment indentation by 4, use same marker.
+         ((= arg 16) (setq indent (+ cur-indent 4)))
+
+         ;; Same level: keep current indentation and marker.
+         (t (setq indent cur-indent)))
+
+        (setq new-indent (make-string indent 32)) ; レベルに応じたインデント数で空白を作る
+        (goto-char new-loc)
+        (cond
+         ;; Unordered list, GFM task list, or ordered list with hash mark
+         ((string-match-p "[\\*\\+-]\\|#\\." marker)
+          (insert new-indent marker)))) ; マークがあってない。どれも*になる…。→markdownと文法が異なるから？でも同じのでやってもできず。
+      ;; Propertize the newly inserted list item now
+      (markdown-syntax-propertize-list-items (point-at-bol) (point-at-eol)))))
 
 (defun dokuwiki-insert-quote ()
   (interactive)

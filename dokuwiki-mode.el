@@ -181,7 +181,7 @@ See also `outline-regexp'.")
              dokuwiki-smiley-list)
    ))
 
-(defcustom dokuwiki-unordered-list-item-prefix "  * "
+(defcustom dokuwiki-ordered-list-item-prefix "  * "
   "String inserted before unordered list items."
   :group 'dokuwiki
   :type 'string
@@ -376,6 +376,37 @@ See also `outline-level'."
 ;;       (insert "\n"))
 ;;     (insert (concat new-indent mark)))))
 
+(defun dokuwiki-cur-list-item-bounds ()
+  "Return bounds for list item at point.
+Return a list of the following form:
+
+    (begin end indent nonlist-indent marker checkbox match)
+
+The named components are:
+
+  - begin: Position of beginning of list item, including leading indentation.
+  - end: Position of the end of the list item, including list item text.
+  - indent: Number of characters of indentation before list marker (an integer).
+  - nonlist-indent: Number characters of indentation, list
+    marker, and whitespace following list marker (an integer).
+  - marker: String containing the list marker and following whitespace
+            (e.g., \"- \" or \"* \").
+  - checkbox: String containing the GFM checkbox portion, if any,
+    including any trailing whitespace before the text
+    begins (e.g., \"[x] \").
+  - match: match data for markdown-regex-list
+
+As an example, for the following unordered list item
+
+   - item
+
+the returned list would be
+
+    (1 14 3 5 \"- \" nil (1 6 1 4 4 5 5 6))
+
+If the point is not inside a list item, return nil."
+  (car (get-text-property (point-at-bol) 'dokuwiki-list-item)))
+
 ;; インデント保持はされてるけど、リストマークが保持されていない。*になる。なんで。書いてあるのと違う...記法が微妙に違うためか。
 (defun dokuwiki-insert-list (&optional arg)
   "Insert a new list item.
@@ -392,14 +423,15 @@ increase the indentation by one level."
   (interactive "p")
   (let (bounds cur-indent marker indent new-indent new-loc)
     (save-match-data
+
       ;; Look for a list item on current or previous non-blank line
-	  ;; 各種代入
       (save-excursion
-        (while (and (not (setq bounds (markdown-cur-list-item-bounds))) ; TODO: listitemをdokuwikiに対応させる
+        (while (and (not (setq bounds (dokuwiki-cur-list-item-bounds))) ; TODO: listitemをdokuwikiに対応させる
                     (not (bobp))
-                    (markdown-cur-line-blank-p))
+                    (dokuwiki-cur-line-blank-p))
           (forward-line -1)))
 
+	  ;; Exist previous lists
       (when bounds
         (cond ((save-excursion
                  (skip-chars-backward " \t")
@@ -424,12 +456,12 @@ increase the indentation by one level."
           (unless (markdown-cur-line-blank-p)
             (newline))))
 
+      ;; When not in a list, start a new ordered one
       (if (not bounds)
-          ;; When not in a list, start a new unordered one
           (progn
             (unless (markdown-cur-line-blank-p)
               (insert "\n"))
-            (insert dokuwiki-unordered-list-item-prefix)) ; TODO: ここで*しか挿入できないのが修正できる？
+            (insert dokuwiki-ordered-list-item-prefix)) ; TODO: ここで*しか挿入できないのが修正できる？
         ;; Compute indentation and marker for new list item
         (setq cur-indent (nth 2 bounds))
         (setq marker (nth 4 bounds))
@@ -449,7 +481,7 @@ increase the indentation by one level."
         (goto-char new-loc)
         (cond
          ;; Unordered list, GFM task list, or ordered list with hash mark
-         ((string-match-p "[\\*\\-]\\|" marker)
+         ((string-match-p "[\\*\\-]" marker)
           (insert new-indent marker))))
       ;; Propertize the newly inserted list item now
       (markdown-syntax-propertize-list-items (point-at-bol) (point-at-eol)))))

@@ -181,6 +181,12 @@ See also `outline-regexp'.")
              dokuwiki-smiley-list)
    ))
 
+(defcustom dokuwiki-unordered-list-item-prefix "  * "
+  "String inserted before unordered list items."
+  :group 'dokuwiki
+  :type 'string
+  )
+
 (defun dokuwiki-code-block-search (limit)
   (if (not (looking-at "[-*]"))
       (re-search-forward ".*$" limit t)))
@@ -389,51 +395,48 @@ increase the indentation by one level."
       ;; Look for a list item on current or previous non-blank line
 	  ;; 各種代入
       (save-excursion
-        (while (and (not (setq bounds (markdown-cur-list-item-bounds))) ; boundsはlist-itemの各種情報、現在行で
+        (while (and (not (setq bounds (markdown-cur-list-item-bounds))) ; TODO: listitemをdokuwikiに対応させる
                     (not (bobp))
                     (markdown-cur-line-blank-p))
-          (forward-line -1))) ; 辿って、一番最後に使われたmarkerがあると止まる
+          (forward-line -1)))
 
-      (when bounds ; boundsがあるとき...
+      (when bounds
         (cond ((save-excursion
-                 (skip-chars-backward " \t") ; インデントを飛ばして移動
-                 (looking-at-p markdown-regex-list)) ; listをサーチ
+                 (skip-chars-backward " \t")
+                 (looking-at-p markdown-regex-list))
                (beginning-of-line)
                (insert "\n")
-               (forward-line -1)) ; カーソルを戻すバージョン？
-              ((not (markdown-cur-line-blank-p)) ; 空白でないときはnewline？(違いがわからなん)
+               (forward-line -1))
+              ((not (dokuwiki-cur-line-blank-p))
                (newline)))
         (setq new-loc (point)))
 
-	  ;; 次の非空白行のリストでboundsを定義する
       ;; Look ahead for a list item on next non-blank line
       (unless bounds
         (save-excursion
           (while (and (null bounds)
-                      (not (eobp)) ; バッファの最後ではない
-                      (markdown-cur-line-blank-p)) ; 空行である
-            (forward-line)				; 次の行に進む…*while内。
-            (setq bounds (markdown-cur-list-item-bounds)))) ; boundsが定義されると抜ける
+                      (not (eobp))
+                      (markdown-cur-line-blank-p))
+            (forward-line)
+            (setq bounds (markdown-cur-list-item-bounds))))
         (when bounds
           (setq new-loc (point))
-          (unless (markdown-cur-line-blank-p) ; 空白でないとき、新しい行。
+          (unless (markdown-cur-line-blank-p)
             (newline))))
 
-      (if (not bounds) ; boundsがないとき。インデントなどがあり大きくなっている。ここじゃないときはインデント使わないってことだよな…。new-locがあるので、上のwhenかunlessのどちらかは確実に評価されることになる。
+      (if (not bounds)
           ;; When not in a list, start a new unordered one
           (progn
             (unless (markdown-cur-line-blank-p)
               (insert "\n"))
-            (insert markdown-unordered-list-item-prefix))
+            (insert dokuwiki-unordered-list-item-prefix)) ; TODO: ここで*しか挿入できないのが修正できる？
         ;; Compute indentation and marker for new list item
         (setq cur-indent (nth 2 bounds))
-        (setq marker (nth 4 bounds))	; markerは何？ -- * とか + とかか。マーク。
+        (setq marker (nth 4 bounds))
         (when (nth 5 bounds)
           (setq marker
                 (concat marker
                         (replace-regexp-in-string "[Xx]" " " (nth 5 bounds)))))
-
-        ;; If current item is a GFM checkbox, insert new unchecked checkbox.
         (cond
 
          ;; Indent: increment indentation by 4, use same marker.
@@ -442,12 +445,12 @@ increase the indentation by one level."
          ;; Same level: keep current indentation and marker.
          (t (setq indent cur-indent)))
 
-        (setq new-indent (make-string indent 32)) ; レベルに応じたインデント数で空白を作る
+        (setq new-indent (make-string indent 32))
         (goto-char new-loc)
         (cond
          ;; Unordered list, GFM task list, or ordered list with hash mark
-         ((string-match-p "[\\*\\+-]\\|#\\." marker)
-          (insert new-indent marker)))) ; マークがあってない。どれも*になる…。→markdownと文法が異なるから？でも同じのでやってもできず。
+         ((string-match-p "[\\*\\-]\\|" marker)
+          (insert new-indent marker))))
       ;; Propertize the newly inserted list item now
       (markdown-syntax-propertize-list-items (point-at-bol) (point-at-eol)))))
 

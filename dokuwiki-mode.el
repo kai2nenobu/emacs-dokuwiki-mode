@@ -187,7 +187,17 @@ See also `outline-regexp'.")
   :type 'string
   )
 
-(defun markdown--cur-list-item-bounds ()
+(defconst dokuwiki-regex-list
+  (markdown-rx line-start
+               ;; 1. Leading whitespace
+               (group (* blank))
+               ;; 2. List marker: a numeral, bullet, or colon
+               (group list-marker)
+               ;; 3. Trailing whitespace
+               (group (+ blank)))
+  "Regular expression for matching list items.")
+
+(defun dokuwiki--cur-list-item-bounds ()
   "Return a list describing the list item at point.
 Assumes that match data is set for `markdown-regex-list'.  See the
 documentation for `markdown-cur-list-item-bounds' for the format of
@@ -200,10 +210,10 @@ the returned list."
                     (match-beginning 2) (match-end 3)))
            (checkbox (match-string-no-properties 4))
            (match (butlast (match-data t)))
-           (end (markdown-cur-list-item-end nonlist-indent)))
-      (list begin end indent nonlist-indent marker checkbox match))))
+           (end nil)
+		   (list begin end indent nonlist-indent marker checkbox match))))
 
-(defun markdown-syntax-propertize-list-items (start end)
+(defun dokuwiki-syntax-propertize-list-items (start end)
   "Propertize list items from START to END.
 Stores nested list item information in the `dokuwiki-list-item'
 text property to make later syntax analysis easier.  The value of
@@ -216,7 +226,7 @@ giving the bounds of the current and parent list items."
       (markdown-search-backward-baseline)
       ;; Search for all list items between baseline and END
       (while (and (< (point) end)
-                  (re-search-forward markdown-regex-list end 'limit))
+                  (re-search-forward dokuwiki-regex-list end 'limit))
         ;; Level of list nesting
         (setq level (length bounds))
         ;; Pre blocks need to be indented one level past the list level
@@ -232,7 +242,7 @@ giving the bounds of the current and parent list items."
          ;; If not, then update levels and propertize list item when in range.
          (t
           (let* ((indent (current-indentation))
-                 (cur-bounds (markdown--cur-list-item-bounds))
+                 (cur-bounds (dokuwiki--cur-list-item-bounds))
                  (first (cl-first cur-bounds))
                  (last (cl-second cur-bounds))
                  (marker (cl-fifth cur-bounds)))
@@ -404,33 +414,6 @@ See also `outline-level'."
   (interactive)
   (dokuwiki-insert-base "  - " ""))
 
-;; (defun dokuwiki-insert-list ()
-;;   (interactive)
-;;   (let (mark search-limit-point)
-;;     ;; get search-limit-point
-;;     (save-excursion
-;;       (progn
-;; 	(end-of-line)
-;; 	(setq search-limit-point (point))
-;; 	))
-;;     ;; search order or non-order list
-;;     (save-excursion
-;;       (if (dokuwiki-cur-line-blank-p)
-;; 	  (forward-line -1)
-;; 	)
-;;       (beginning-of-line)
-;;       (if (search-forward "  -" search-limit-point t)
-;; 	     (setq mark "- ")
-;; 		(setq mark "* ")))
-;; 	;; indent
-;; 	(setq indent 2)
-;; 	(setq new-indent (make-string indent 32))
-;;     ;; insert
-;;   (progn
-;;     (unless (dokuwiki-cur-line-blank-p)
-;;       (insert "\n"))
-;;     (insert (concat new-indent mark)))))
-
 (defun dokuwiki-cur-list-item-bounds ()
   "Return bounds for list item at point.
 Return a list of the following form:
@@ -460,8 +443,7 @@ the returned list would be
     (1 14 3 5 \"- \" nil (1 6 1 4 4 5 5 6))
 
 If the point is not inside a list item, return nil."
-  (car (get-text-property (point-at-bol) 'dokuwiki-list-item))) ;; ERROR: Where define dokuwiki-list-item??
-  ;; what going wrong properties
+  (car (get-text-property (point-at-bol) 'dokuwiki-list-item)))
 
 (defun dokuwiki-insert-list (&optional arg)
   "Insert a new list item.
@@ -490,7 +472,7 @@ increase the indentation by one level."
       (when bounds
         (cond ((save-excursion
                  (skip-chars-backward " \t")
-                 (looking-at-p markdown-regex-list)) ; suspicious
+                 (looking-at-p markdown-regex-list))
                (beginning-of-line)
                (insert "\n")
                (forward-line -1))
@@ -510,7 +492,7 @@ increase the indentation by one level."
           (setq new-loc (point))
           (unless (markdown-cur-line-blank-p)
             (newline))))
-	  (message "%smarker" marker) ;; ERROR: bounds not working!!
+	  (message "marker:%s" bounds) ;; ERROR: bounds not working!!
       ;; When not in a list, start a new ordered one(*)
       (if (not bounds)
           (progn
@@ -539,7 +521,7 @@ increase the indentation by one level."
          ((string-match-p "[\\*\\-]" marker)
           (insert new-indent marker))))
       ;; Propertize the newly inserted list item now
-      (markdown-syntax-propertize-list-items (point-at-bol) (point-at-eol)))))
+      (dokuwiki-syntax-propertize-list-items (point-at-bol) (point-at-eol)))))
 
 (defun dokuwiki-insert-quote ()
   (interactive)

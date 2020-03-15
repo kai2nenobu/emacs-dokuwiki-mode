@@ -187,8 +187,40 @@ See also `outline-regexp'.")
   :type 'string
   )
 
+; -----------
+
+;; (eval-and-compile
+;;   (defconst dokuwiki-rx-constituents
+;;     `((newline . ,(rx "\n"))
+;;       (indent . ,(rx (or (repeat 4 " ") "\t")))
+;;       (block-end . ,(rx (and (or (one-or-more (zero-or-more blank) "\n") line-end))))
+;;       (numeral . ,(rx (and (one-or-more (any "0-9#")) ".")))
+;;       (bullet . ,(rx (any "*+:-")))
+;;       (list-marker . ,(rx (any "*+:-")))
+;;       (checkbox . ,(rx "[" (any " xX") "]")))
+;;     "Markdown-specific sexps for `markdown-rx'")
+
+;;   (defun dokuwiki-rx-to-string (form &optional no-group)
+;;     "Markdown mode specialized `rx-to-string' function.
+;; This variant supports named Markdown expressions in FORM.
+;; NO-GROUP non-nil means don't put shy groups around the result."
+;;     (let ((rx-constituents (append dokuwiki-rx-constituents rx-constituents)))
+;;       (rx-to-string form no-group)))
+
+;;     (defmacro dokuwiki-rx (&rest regexps)
+;;     "Markdown mode specialized rx macro.
+;; This variant of `rx' supports common Markdown named REGEXPS."
+;;     (cond ((null regexps)
+;;            (error "No regexp"))
+;;           ((cdr regexps)
+;;            (dokuwiki-rx-to-string `(and ,@regexps) t))
+;;           (t
+;;            (dokuwiki-rx-to-string (car regexps) t)))))
+
+; -----------
+
 (defconst dokuwiki-regex-list
-  (markdown-rx line-start
+  (dokuwiki-rx line-start
                ;; 1. Leading whitespace
                (group (* blank))
                ;; 2. List marker: a numeral, bullet, or colon
@@ -211,7 +243,7 @@ the returned list."
            (checkbox (match-string-no-properties 4))
            (match (butlast (match-data t)))
            (end nil)
-		   (list begin end indent nonlist-indent marker checkbox match))))
+		   (list begin end indent nonlist-indent marker checkbox match)))))
 
 (defun dokuwiki-syntax-propertize-list-items (start end)
   "Propertize list items from START to END.
@@ -472,7 +504,7 @@ increase the indentation by one level."
       (when bounds
         (cond ((save-excursion
                  (skip-chars-backward " \t")
-                 (looking-at-p markdown-regex-list))
+                 (looking-at-p dokuwiki-regex-list))
                (beginning-of-line)
                (insert "\n")
                (forward-line -1))
@@ -485,18 +517,19 @@ increase the indentation by one level."
         (save-excursion
           (while (and (null bounds)
                       (not (eobp))
-                      (markdown-cur-line-blank-p))
+                      (dokuwiki-cur-line-blank-p))
             (forward-line)
-            (setq bounds (markdown-cur-list-item-bounds))))
+            (setq bounds (dokuwiki-cur-list-item-bounds))))
         (when bounds
           (setq new-loc (point))
-          (unless (markdown-cur-line-blank-p)
+          (unless (dokuwiki-cur-line-blank-p)
             (newline))))
-	  (message "marker:%s" bounds) ;; ERROR: bounds not working!!
+	  (message "marker:%s" bounds)
+
       ;; When not in a list, start a new ordered one(*)
       (if (not bounds)
           (progn
-            (unless (markdown-cur-line-blank-p)
+            (unless (dokuwiki-cur-line-blank-p)
               (insert "\n"))
             (insert dokuwiki-ordered-list-item-prefix))
         ;; Compute indentation and marker for new list item
@@ -507,7 +540,6 @@ increase the indentation by one level."
                 (concat marker
                         (replace-regexp-in-string "[Xx]" " " (nth 5 bounds)))))
         (cond
-
          ;; Indent: increment indentation by 4, use same marker.
          ((= arg 16) (setq indent (+ cur-indent 4)))
 
@@ -517,8 +549,8 @@ increase the indentation by one level."
         (setq new-indent (make-string indent 32))
         (goto-char new-loc)
         (cond
-         ;; Unordered list, GFM task list, or ordered list with hash mark
-         ((string-match-p "[\\*\\-]" marker)
+         ;; Unordered list or ordered list with hash mark
+         ((string-match-p "[\\*\\+-]" marker)
           (insert new-indent marker))))
       ;; Propertize the newly inserted list item now
       (dokuwiki-syntax-propertize-list-items (point-at-bol) (point-at-eol)))))

@@ -539,18 +539,26 @@ increase the indentation by one level."
                 (concat marker
                         (replace-regexp-in-string "[Xx]" " " (nth 5 bounds)))))
         (cond
+		 ;; Dedent: decrement indentation, find previous marker.
+         ((= arg 4)
+          (setq indent (max (- cur-indent 4) 0))
+          (let ((prev-bounds
+                 (save-excursion
+                   (goto-char (nth 0 bounds))
+                   (when (markdown-up-list)
+                     (dokuwiki-cur-list-item-bounds)))))
+            (when prev-bounds
+              (setq marker (nth 4 prev-bounds)))))
          ;; Indent: increment indentation by 4, use same marker.
          ((= arg 16) (setq indent (+ cur-indent 4)))
-
          ;; Same level: keep current indentation and marker.
          (t (setq indent cur-indent)))
-
         (setq new-indent (make-string indent 32))
         (goto-char new-loc)
-        (cond
-         ;; Unordered list or ordered list with hash mark
-         ((string-match-p "[\\*\\+-]" marker)
-          (insert new-indent marker))))
+
+        (if (string-match-p "[\\*\\-]" marker)
+			;; Ordered list
+			(insert new-indent marker)))
       ;; Propertize the newly inserted list item now
       (dokuwiki-syntax-propertize-list-items (point-at-bol) (point-at-eol)))))
 

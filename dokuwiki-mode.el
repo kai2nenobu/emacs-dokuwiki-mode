@@ -189,33 +189,32 @@ See also `outline-regexp'.")
 
 ; -----------
 
-;; (eval-and-compile
-;;   (defconst dokuwiki-rx-constituents
-;;     `((newline . ,(rx "\n"))
-;;       (indent . ,(rx (or (repeat 4 " ") "\t")))
-;;       (block-end . ,(rx (and (or (one-or-more (zero-or-more blank) "\n") line-end))))
-;;       (numeral . ,(rx (and (one-or-more (any "0-9#")) ".")))
-;;       (bullet . ,(rx (any "*+:-")))
-;;       (list-marker . ,(rx (any "*+:-")))
-;;       (checkbox . ,(rx "[" (any " xX") "]")))
-;;     "Markdown-specific sexps for `markdown-rx'")
+(eval-and-compile
+  (defconst dokuwiki-rx-constituents
+    `((newline . ,(rx "\n"))
+      (indent . ,(rx (or (repeat 4 " ") "\t")))
+      (block-end . ,(rx (and (or (one-or-more (zero-or-more blank) "\n") line-end))))
+      (numeral . ,(rx (and (one-or-more (any "0-9#")) ".")))
+      (bullet . ,(rx (any "*+:-")))
+      (list-marker . ,(rx (any "*+:-"))))
+    "Markdown-specific sexps for `markdown-rx'")
 
-;;   (defun dokuwiki-rx-to-string (form &optional no-group)
-;;     "Markdown mode specialized `rx-to-string' function.
-;; This variant supports named Markdown expressions in FORM.
-;; NO-GROUP non-nil means don't put shy groups around the result."
-;;     (let ((rx-constituents (append dokuwiki-rx-constituents rx-constituents)))
-;;       (rx-to-string form no-group)))
+  (defun dokuwiki-rx-to-string (form &optional no-group)
+    "Markdown mode specialized `rx-to-string' function.
+This variant supports named Markdown expressions in FORM.
+NO-GROUP non-nil means don't put shy groups around the result."
+    (let ((rx-constituents (append dokuwiki-rx-constituents rx-constituents)))
+      (rx-to-string form no-group)))
 
-;;     (defmacro dokuwiki-rx (&rest regexps)
-;;     "Markdown mode specialized rx macro.
-;; This variant of `rx' supports common Markdown named REGEXPS."
-;;     (cond ((null regexps)
-;;            (error "No regexp"))
-;;           ((cdr regexps)
-;;            (dokuwiki-rx-to-string `(and ,@regexps) t))
-;;           (t
-;;            (dokuwiki-rx-to-string (car regexps) t)))))
+  (defmacro dokuwiki-rx (&rest regexps)
+    "Markdown mode specialized rx macro.
+This variant of `rx' supports common Markdown named REGEXPS."
+    (cond ((null regexps)
+           (error "No regexp"))
+          ((cdr regexps)
+           (dokuwiki-rx-to-string `(and ,@regexps) t))
+          (t
+           (dokuwiki-rx-to-string (car regexps) t)))))
 
 ; -----------
 
@@ -242,8 +241,8 @@ the returned list."
                     (match-beginning 2) (match-end 3)))
            (checkbox (match-string-no-properties 4))
            (match (butlast (match-data t)))
-           (end nil)
-		   (list begin end indent nonlist-indent marker checkbox match)))))
+           (end (markdown-cur-list-item-end nonlist-indent)))
+	  (list begin end indent nonlist-indent marker checkbox match))))
 
 (defun dokuwiki-syntax-propertize-list-items (start end)
   "Propertize list items from START to END.
@@ -502,6 +501,7 @@ increase the indentation by one level."
 
 	  ;; Exists a list
       (when bounds
+		(message "exist a list:%s" bounds)
         (cond ((save-excursion
                  (skip-chars-backward " \t")
                  (looking-at-p dokuwiki-regex-list))
@@ -524,7 +524,6 @@ increase the indentation by one level."
           (setq new-loc (point))
           (unless (dokuwiki-cur-line-blank-p)
             (newline))))
-	  (message "marker:%s" bounds)
 
       ;; When not in a list, start a new ordered one(*)
       (if (not bounds)

@@ -491,17 +491,17 @@ increase the indentation by one level."
   (interactive "p")
   (let (bounds cur-indent marker indent new-indent new-loc)
     (save-match-data
-
       ;; Look for a list item on current or previous non-blank line
       (save-excursion
+        (dokuwiki-syntax-propertize-list-items (point-at-bol) (point-at-eol))
         (while (and (not (setq bounds (dokuwiki-cur-list-item-bounds)))
                     (not (bobp))
                     (dokuwiki-cur-line-blank-p))
           (forward-line -1)))
 
+	  (message "bounds:%s" bounds)
 	  ;; Exists a list
       (when bounds
-		(message "exist a list:%s" bounds)
         (cond ((save-excursion
                  (skip-chars-backward " \t")
                  (looking-at-p dokuwiki-regex-list))
@@ -525,8 +525,8 @@ increase the indentation by one level."
           (unless (dokuwiki-cur-line-blank-p)
             (newline))))
 
-      ;; When not in a list, start a new ordered one(*)
       (if (not bounds)
+		  ;; When not in a list, start a new ordered one(*)
           (progn
             (unless (dokuwiki-cur-line-blank-p)
               (insert "\n"))
@@ -560,7 +560,8 @@ increase the indentation by one level."
 			;; Ordered list
 			(insert new-indent marker)))
       ;; Propertize the newly inserted list item now
-      (dokuwiki-syntax-propertize-list-items (point-at-bol) (point-at-eol)))))
+      (dokuwiki-syntax-propertize-list-items (point-at-bol) (point-at-eol))
+	  )))
 
 (defun dokuwiki-insert-quote ()
   (interactive)

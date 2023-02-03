@@ -171,7 +171,7 @@ See also `outline-level'."
   '(progn
      (define-key dokuwiki-mode-map (kbd "TAB") 'outline-cycle)
      (define-key dokuwiki-mode-map (kbd "<S-tab>")
-       '(lambda () (interactive) (outline-cycle '(4))))
+       #'(lambda () (interactive) (outline-cycle '(4))))
      (define-key dokuwiki-mode-map (kbd "<M-S-right>") 'outline-demote)
      (define-key dokuwiki-mode-map (kbd "<M-S-left>") 'outline-promote)
      (define-key dokuwiki-mode-map (kbd "<M-up>") 'outline-move-subtree-up)
@@ -180,14 +180,34 @@ See also `outline-level'."
      ;; Enable outline-magic features in `dokuwiki-mode' buffers
      (dolist (buf (buffer-list))
        (with-current-buffer buf
-         (when (eq major-mode 'dokuwiki-mode) (dokuwiki-outline-magic-hook))))
-     ))
+         (when (eq major-mode 'dokuwiki-mode) (dokuwiki-outline-magic-hook))))))
 
 (defun dokuwiki-outline-magic-hook ()
   "Hook to configure `outline-magic'."
   (set (make-local-variable 'outline-promotion-headings)
        '(("======" . 1) ("=====" . 2) ("====" . 3) ("===" . 4) ("==" . 5)))
   (set (make-local-variable 'outline-cycle-emulate-tab) t))
+
+(defun dokuwiki-match-header ()
+  "Make header symmetric.  Match number of `=` at end to number at start."
+  (interactive)
+  (save-excursion
+    (outline-back-to-heading)           ; requires outline-magic
+    (let* ((b (line-beginning-position))
+           (e (line-end-position))
+           (str (buffer-substring-no-properties b e))
+           (rpl (replace-regexp-in-string "^ *\\(=*\\)\\(.*[^=]\\).*" "\\1\\2\\1" str)))
+      (kill-region b e)
+      (insert rpl))))
+
+
+(defadvice outline-promote (after dokuwiki-mode-promote activate)
+  "Advise promotion to update ending to symmetric '='."
+  (when (derived-mode-p 'dokuwiki-mode) (dokuwiki-match-header)))
+(defadvice outline-demote (after dokuwiki-mode-demote activate)
+  "Advise demotion to update ending to symmetric '='."
+  (when (derived-mode-p 'dokuwiki-mode) (dokuwiki-match-header)))
+
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"
@@ -197,8 +217,7 @@ See also `outline-level'."
          nil nil ((?_ . "w")) nil))
   (set (make-local-variable 'outline-regexp) dokuwiki-outline-regexp)
   (set (make-local-variable 'outline-level) 'dokuwiki-outline-level)
-  (outline-minor-mode 1)
-  )
+  (outline-minor-mode 1))
 
 (provide 'dokuwiki-mode)
 

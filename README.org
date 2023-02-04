@@ -1,14 +1,38 @@
 * Overview
-Major mode for DokuWiki document
+Major mode for DokuWiki documents.
+
+Used by [[https://github.com/accidentalrebel/emacs-dokuwiki][dokuwiki]] (XMLRPC editing of live dokuwikis) and [[https://github.com/WillForan/zim-wiki-mode][zim-wiki-mode]] ([[https://zim-wiki.org][Zim Desktop Wiki]] uses dwiki format).
+
+* Install
+From melpa like ~M-x install-package dokuwiki-mode~ 
+
+Or buggy bleeding edge with [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]]
+#+begin_src emacs-lisp
+(use-package dokuwiki-mode
+  :quelpa ((dokuwiki-mode :fetcher github
+                     :repo "WillForan/dokuwiki-mode")
+           :upgrade t)
+  :ensure t
+  :config
+   (require 'outline-magic))
+
+#+end_src
+
+Either way, you'll likely want to make sure ~outline-magic~ is also loaded.
+
 * Features
 ** Highlight markup of DokuWiki
 ** Work with ~outline-magic~
 ~outline-magic~ enables to handle headings like ~org-mode~. If you load
-~outline-magic~, ~dokuwiki-mode~ use it.
+~outline-magic~, ~dokuwiki-mode~ will use it.
+
+The default key bindings for headers (a la org-mode) on ~meta-shift-arrow~ (outline-magic), ~C-c C-{n,p,f,b,u,@}~, and ~TAB/Shift-Tab~
+
 * TODOs
 - [ ] Highlight multiline block
-- [ ] Improve behavior of ~outline-promote~ and ~outline-demote~
 * ChangeLog
+- Version 0.1.2
+  - ~defadvice~ on outline-magic's promote, demote, and insert for symmetric ~===~ in headers.
 - Version 0.1.1
   - Change =defgroup= group name to avoid conflicting with [[https://github.com/accidentalrebel/emacs-dokuwiki][dokuwiki.el]] ([[https://github.com/kai2nenobu/emacs-dokuwiki-mode/pull/3][#3]] thanks [[https://github.com/zonuexe][@zonuexe]])
 - Version 0.1.0

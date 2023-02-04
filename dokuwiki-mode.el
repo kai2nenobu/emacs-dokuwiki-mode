@@ -1,10 +1,12 @@
 ;;; dokuwiki-mode.el --- Major mode for DokuWiki document
 
 ;; Copyright (C)  2013-2017 Tsunenobu Kai
+;;
+;; 2023 - Contributions from Will Foran
 
 ;; Author: Tsunenobu Kai <kai2nenobu@gmail.com>
 ;; URL: https://github.com/kai2nenobu/emacs-dokuwiki-mode
-;; Version: 0.1.1
+;; Version: 0.1.2
 ;; Keywords: hypermedia text DokuWiki
 
 ;; This file is not part of GNU Emacs.
@@ -35,6 +37,7 @@
 
 (defvar dokuwiki-mode-map
   (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c RET") 'outline-insert-heading)
     (define-key map (kbd "C-c C-n") 'outline-next-visible-heading)
     (define-key map (kbd "C-c C-p") 'outline-previous-visible-heading)
     (define-key map (kbd "C-c C-f") 'outline-forward-same-level)
@@ -205,6 +208,9 @@ See also `outline-level'."
   "Advise promotion to update ending to symmetric '='."
   (when (derived-mode-p 'dokuwiki-mode) (dokuwiki-match-header)))
 (defadvice outline-demote (after dokuwiki-mode-demote activate)
+  "Advise demotion to update ending to symmetric '='."
+  (when (derived-mode-p 'dokuwiki-mode) (dokuwiki-match-header)))
+(defadvice outline-insert-heading (after dokuwiki-mode-insert-heading activate)
   "Advise demotion to update ending to symmetric '='."
   (when (derived-mode-p 'dokuwiki-mode) (dokuwiki-match-header)))
 

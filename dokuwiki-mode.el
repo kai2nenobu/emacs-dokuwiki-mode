@@ -203,6 +203,16 @@ See also `outline-level'."
       (kill-region b e)
       (insert rpl))))
 
+(defun dokuwiki-insert-next-header ()
+  "Insert next header level down from current.  Position cursor after markup."
+  (interactive)
+  (end-of-line)
+  (outline-insert-heading)
+  (delete-char 1)
+  (dokuwiki-match-header)
+  (skip-chars-forward "=")
+  (insert " "))
+
 
 (defadvice outline-promote (after dokuwiki-mode-promote activate)
   "Advise promotion to update ending to symmetric '='."

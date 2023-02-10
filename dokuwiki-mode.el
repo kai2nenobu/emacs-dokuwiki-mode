@@ -1,10 +1,12 @@
 ;;; dokuwiki-mode.el --- Major mode for DokuWiki document
 
 ;; Copyright (C)  2013-2017 Tsunenobu Kai
+;;
+;; 2023 - Contributions from Will Foran
 
 ;; Author: Tsunenobu Kai <kai2nenobu@gmail.com>
 ;; URL: https://github.com/kai2nenobu/emacs-dokuwiki-mode
-;; Version: 0.1.1
+;; Version: 0.1.2
 ;; Keywords: hypermedia text DokuWiki
 
 ;; This file is not part of GNU Emacs.
@@ -35,6 +37,7 @@
 
 (defvar dokuwiki-mode-map
   (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c RET") 'outline-insert-heading)
     (define-key map (kbd "C-c C-n") 'outline-next-visible-heading)
     (define-key map (kbd "C-c C-p") 'outline-previous-visible-heading)
     (define-key map (kbd "C-c C-f") 'outline-forward-same-level)
@@ -167,27 +170,74 @@ See also `outline-level'."
       (- const (length headline)))))
 
 ;;;; Work with `outline-magic'
+(defun dokuwiki-outline-cycle-all ()
+  "Cycle all headings -- run as if point is at buffer top."
+  (interactive) (outline-cycle '(4)))
+
+(defun dokuwiki-outline-magic-set-bindings ()
+  "Bindings to demote/promote and cycle: functions provided by outline-magic."
+  (interactive)
+  (define-key dokuwiki-mode-map (kbd "TAB") 'outline-cycle)
+  (define-key dokuwiki-mode-map (kbd "<backtab>") #'outline-cycle)
+
+  (define-key dokuwiki-mode-map (kbd "<S-tab>") #'dokuwiki-outline-cycle-all)
+  (define-key dokuwiki-mode-map (kbd "M-<iso-lefttab>") #'dokuwiki-outline-cycle-all)
+
+  (define-key dokuwiki-mode-map (kbd "<M-S-right>") 'outline-demote)
+  (define-key dokuwiki-mode-map (kbd "<M-S-left>") 'outline-promote)
+  (define-key dokuwiki-mode-map (kbd "<M-up>") 'outline-move-subtree-up)
+  (define-key dokuwiki-mode-map (kbd "<M-down>") 'outline-move-subtree-down)
+  (define-key dokuwiki-mode-map (kbd "M-RET") #'dokuwiki-insert-next-header))
+
 (eval-after-load "outline-magic"
   '(progn
-     (define-key dokuwiki-mode-map (kbd "TAB") 'outline-cycle)
-     (define-key dokuwiki-mode-map (kbd "<S-tab>")
-       '(lambda () (interactive) (outline-cycle '(4))))
-     (define-key dokuwiki-mode-map (kbd "<M-S-right>") 'outline-demote)
-     (define-key dokuwiki-mode-map (kbd "<M-S-left>") 'outline-promote)
-     (define-key dokuwiki-mode-map (kbd "<M-up>") 'outline-move-subtree-up)
-     (define-key dokuwiki-mode-map (kbd "<M-down>") 'outline-move-subtree-down)
+     ;; FIXME: need to do this buffer if all are done below?
      (add-hook 'dokuwiki-mode-hook 'dokuwiki-outline-magic-hook)
      ;; Enable outline-magic features in `dokuwiki-mode' buffers
      (dolist (buf (buffer-list))
        (with-current-buffer buf
-         (when (eq major-mode 'dokuwiki-mode) (dokuwiki-outline-magic-hook))))
-     ))
+         (when (eq major-mode 'dokuwiki-mode) (dokuwiki-outline-magic-hook))))))
 
 (defun dokuwiki-outline-magic-hook ()
   "Hook to configure `outline-magic'."
+  (dokuwiki-outline-magic-set-bindings)
   (set (make-local-variable 'outline-promotion-headings)
        '(("======" . 1) ("=====" . 2) ("====" . 3) ("===" . 4) ("==" . 5)))
   (set (make-local-variable 'outline-cycle-emulate-tab) t))
+
+(defun dokuwiki-match-header ()
+  "Make header symmetric.  Match number of `=` at end to number at start."
+  (interactive)
+  (save-excursion
+    (outline-back-to-heading)           ; requires outline-magic
+    (let* ((b (line-beginning-position))
+           (e (line-end-position))
+           (str (buffer-substring-no-properties b e))
+           (rpl (replace-regexp-in-string "^ *\\(=*\\)\\(.*[^=]\\).*" "\\1\\2\\1" str)))
+      (kill-region b e)
+      (insert rpl))))
+
+(defun dokuwiki-insert-next-header ()
+  "Insert next header level down from current.  Position cursor after markup."
+  (interactive)
+  (end-of-line)
+  (outline-insert-heading)
+  (delete-char 1)
+  (dokuwiki-match-header)
+  (skip-chars-forward "=")
+  (insert " "))
+
+
+(defadvice outline-promote (after dokuwiki-mode-promote activate)
+  "Advise promotion to update ending to symmetric '='."
+  (when (derived-mode-p 'dokuwiki-mode) (dokuwiki-match-header)))
+(defadvice outline-demote (after dokuwiki-mode-demote activate)
+  "Advise demotion to update ending to symmetric '='."
+  (when (derived-mode-p 'dokuwiki-mode) (dokuwiki-match-header)))
+(defadvice outline-insert-heading (after dokuwiki-mode-insert-heading activate)
+  "Advise demotion to update ending to symmetric '='."
+  (when (derived-mode-p 'dokuwiki-mode) (dokuwiki-match-header)))
+
 
 ;;;###autoload
 (define-derived-mode dokuwiki-mode text-mode "DokuWiki"
@@ -197,8 +247,7 @@ See also `outline-level'."
          nil nil ((?_ . "w")) nil))
   (set (make-local-variable 'outline-regexp) dokuwiki-outline-regexp)
   (set (make-local-variable 'outline-level) 'dokuwiki-outline-level)
-  (outline-minor-mode 1)
-  )
+  (outline-minor-mode 1))
 
 (provide 'dokuwiki-mode)
 

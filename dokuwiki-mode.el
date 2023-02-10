@@ -170,15 +170,28 @@ See also `outline-level'."
       (- const (length headline)))))
 
 ;;;; Work with `outline-magic'
+(defun dokuwiki-outline-cycle-all ()
+  "Cycle all headings -- run as if point is at buffer top."
+  (interactive) (outline-cycle '(4)))
+
+(defun dokuwiki-outline-magic-set-bindings ()
+  "Bindings to demote/promote and cycle: functions provided by outline-magic."
+  (interactive)
+  (define-key dokuwiki-mode-map (kbd "TAB") 'outline-cycle)
+  (define-key dokuwiki-mode-map (kbd "<backtab>") #'outline-cycle)
+
+  (define-key dokuwiki-mode-map (kbd "<S-tab>") #'dokuwiki-outline-cycle-all)
+  (define-key dokuwiki-mode-map (kbd "M-<iso-lefttab>") #'dokuwiki-outline-cycle-all)
+
+  (define-key dokuwiki-mode-map (kbd "<M-S-right>") 'outline-demote)
+  (define-key dokuwiki-mode-map (kbd "<M-S-left>") 'outline-promote)
+  (define-key dokuwiki-mode-map (kbd "<M-up>") 'outline-move-subtree-up)
+  (define-key dokuwiki-mode-map (kbd "<M-down>") 'outline-move-subtree-down)
+  (define-key dokuwiki-mode-map (kbd "M-RET") #'dokuwiki-insert-next-header))
+
 (eval-after-load "outline-magic"
   '(progn
-     (define-key dokuwiki-mode-map (kbd "TAB") 'outline-cycle)
-     (define-key dokuwiki-mode-map (kbd "<S-tab>")
-       #'(lambda () (interactive) (outline-cycle '(4))))
-     (define-key dokuwiki-mode-map (kbd "<M-S-right>") 'outline-demote)
-     (define-key dokuwiki-mode-map (kbd "<M-S-left>") 'outline-promote)
-     (define-key dokuwiki-mode-map (kbd "<M-up>") 'outline-move-subtree-up)
-     (define-key dokuwiki-mode-map (kbd "<M-down>") 'outline-move-subtree-down)
+     ;; FIXME: need to do this buffer if all are done below?
      (add-hook 'dokuwiki-mode-hook 'dokuwiki-outline-magic-hook)
      ;; Enable outline-magic features in `dokuwiki-mode' buffers
      (dolist (buf (buffer-list))
@@ -187,6 +200,7 @@ See also `outline-level'."
 
 (defun dokuwiki-outline-magic-hook ()
   "Hook to configure `outline-magic'."
+  (dokuwiki-outline-magic-set-bindings)
   (set (make-local-variable 'outline-promotion-headings)
        '(("======" . 1) ("=====" . 2) ("====" . 3) ("===" . 4) ("==" . 5)))
   (set (make-local-variable 'outline-cycle-emulate-tab) t))
